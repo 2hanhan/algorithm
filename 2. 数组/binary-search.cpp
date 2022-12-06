@@ -102,5 +102,6 @@ int main(int argc, char **argv)
     std::cout << endl
               << "查询目标:" << solution.search(nums, target) << std::endl;
 
+    cout << "-----结束-----" << endl;
     return 0;
 }

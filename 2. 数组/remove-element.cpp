@@ -65,5 +65,6 @@ int main(int argc, char **argv)
     }
     std::cout << std::endl;
 
+    cout << "-----结束-----" << endl;
     return 0;
 }
