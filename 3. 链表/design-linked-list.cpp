@@ -4,7 +4,7 @@
  * @brief
  * @version 0.1
  * @date 2022-12-07
- * - 3. 设计链表
+ * - 3.3 设计链表
  * - 增加或者删除链表的制定位置的节点时候
  * - 新增首先 newNode->next = cur->next ,然后在cur->next = newNode
  * - 删除节点 首先temp = cur->next,然后cur->next =cur->next->next并且delete temp;
