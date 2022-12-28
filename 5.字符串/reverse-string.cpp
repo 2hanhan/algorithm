@@ -4,7 +4,7 @@
  * @brief
  * @version 0.1
  * @date 2022-12-26
- * 6.1 翻转字符串
+ * 5.1 翻转字符串
  * @copyright Copyright (c) 2022
  *
  */

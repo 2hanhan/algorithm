@@ -28,32 +28,32 @@ struct ListNode
     ListNode(int x, ListNode *next) : val(x), next(next) {}
 };
 
-// class Solution
-// {
-// public:
-//     ListNode *swapPairs(ListNode *head)
-//     {
+class Solution0
+{
+public:
+    ListNode *swapPairs(ListNode *head)
+    {
 
-//         ListNode *dummyhead = new ListNode();
-//         dummyhead->next = head;
+        ListNode *dummyhead = new ListNode();
+        dummyhead->next = head;
 
-//         ListNode *cur = dummyhead;
-//         while (cur->next != NULL && cur->next->next != NULL)
-//         {
-//             ListNode *temp = cur->next->next->next;
-//             ListNode *temp1 = cur->next->next;
+        ListNode *cur = dummyhead;
+        while (cur->next != NULL && cur->next->next != NULL)
+        {
+            ListNode *temp = cur->next->next->next;
+            ListNode *temp1 = cur->next->next;
 
-//             cur->next->next->next = cur->next; // 2->1 交换
-//             cur->next->next = temp;            // 1->3 指向下一个
-//             cur->next = temp1;                 // dummyhead->2 类似头结点
+            cur->next->next->next = cur->next; // 2->1 交换
+            cur->next->next = temp;            // 1->3 指向下一个
+            cur->next = temp1;                 // dummyhead->2 类似头结点
 
-//             cur = cur->next->next;
-//         }
-//         return dummyhead->next;
-//     }
-// };
+            cur = cur->next->next;
+        }
+        return dummyhead->next;
+    }
+};
 
-class Solution
+class Solution1
 {
 public:
     ListNode *swapPairs(ListNode *head)
@@ -103,7 +103,7 @@ int main(int argc, char **argv)
         }
     }
 
-    Solution solution;
+    Solution0 solution;
 
     std::cout << "原链表:" << std::endl;
     cur = head;

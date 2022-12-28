@@ -4,10 +4,10 @@
  * @brief
  * @version 0.1
  * @date 2022-12-23
- * 四数之和 同一个数组提供 a、b、c、d
+ * 四数之和
  * @copyright Copyright (c) 2022
  * - 注意
- * - (long) int + int 和(long) int * int
+ * - (long) int + int 和(long) int * int 
  * - 使用(long)防止求和后溢出
  */
 

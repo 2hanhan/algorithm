@@ -4,7 +4,7 @@
  * @brief
  * @version 0.1
  * @date 2022-12-22
- * - 4.6 四数相加II
+ * 4.6 四数相加II，数组1、2、3、4分别提供a、b、c、d
  * @copyright Copyright (c) 2022
  *
  */
