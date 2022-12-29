@@ -81,7 +81,7 @@ public:
 };
 
 // 双指针压栈
-class Solution1
+class Solution2
 {
 public:
     vector<int> postorderTraversal(TreeNode *root)
