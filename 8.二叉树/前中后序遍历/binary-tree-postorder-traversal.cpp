@@ -6,6 +6,10 @@
  * @date 2022-12-29
  * https://leetcode.cn/problems/binary-tree-postorder-traversal/
  * 二叉树后序遍历
+ * 递归法
+ * 压栈法
+ * 标记法
+ * 双指针压栈
  * @copyright Copyright (c) 2022
  *
  */
@@ -88,6 +92,48 @@ public:
     {
         vector<int> result;
         stack<TreeNode *> st;
+        if (root != NULL)
+        {
+            st.push(root);
+        }
+        while (!st.empty())
+        {
+            TreeNode *node = st.top();
+            if (node != NULL)
+            {
+                st.pop();
+
+                st.push(node); // 中
+                st.push(NULL);
+                if (node->right) // 右
+                {
+                    st.push(node->right);
+                }
+                if (node->left) // 左
+                {
+                    st.push(node->left);
+                }
+            }
+            else
+            {
+                st.pop();
+                node = st.top();
+                st.pop();
+                result.push_back(node->val);
+            }
+        }
+        return result;
+    }
+};
+
+// 双指针压栈
+class Solution3
+{
+public:
+    vector<int> postorderTraversal(TreeNode *root)
+    {
+        vector<int> result;
+        stack<TreeNode *> st;
         TreeNode *cur = NULL;
         TreeNode *help = root; // 记录上一个打印存储的节点，出栈的节点
 
@@ -105,7 +151,7 @@ public:
                 st.push(cur->left);
             }
             // 上一个进栈节点的右节点没处理完，有右节点，并且右节点没处理(上一次打印过右，则处理了)
-            else if (cur->right != NULL && help != cur->right) 
+            else if (cur->right != NULL && help != cur->right)
             {
                 st.push(cur->right);
             }

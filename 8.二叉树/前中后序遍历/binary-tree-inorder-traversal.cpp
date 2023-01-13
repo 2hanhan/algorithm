@@ -6,6 +6,9 @@
  * @date 2022-12-29
  * https://leetcode.cn/problems/binary-tree-inorder-traversal/
  * 二叉树中序遍历
+ * 递归法
+ * 压栈法
+ * 标记法
  * @copyright Copyright (c) 2022
  *
  */
@@ -76,6 +79,48 @@ public:
             }
         }
 
+        return result;
+    }
+};
+
+// 标记法
+class Solution1
+{
+public:
+    vector<int> inorderTraversal(TreeNode *root)
+    {
+        vector<int> result;
+        stack<TreeNode *> st;
+        if (root != NULL)
+        {
+            st.push(root);
+        }
+        while (!st.empty())
+        {
+            TreeNode *node = st.top();
+            if (node != NULL)
+            {
+                st.pop();
+
+                if (node->right) // 右
+                {
+                    st.push(node->right);
+                }
+                st.push(node); // 中
+                st.push(NULL);
+                if (node->left)
+                {
+                    st.push(node->left); // 左
+                }
+            }
+            else
+            {
+                st.pop();
+                node = st.top();
+                st.pop();
+                result.push_back(node->val);
+            }
+        }
         return result;
     }
 };

@@ -83,3 +83,44 @@ public:
         return result;
     }
 };
+
+// 标记法
+class Solution2
+{
+public:
+    vector<int> preorderTraversal(TreeNode *root)
+    {
+        vector<int> result;
+        stack<TreeNode *> st;
+        if (root != NULL)
+        {
+            st.push(root);
+        }
+        while (!st.empty())
+        {
+            TreeNode *node = st.top(); // 上一次压栈的节点
+            if (node != NULL)
+            {
+                st.pop();
+                if (node->right) // 右
+                {
+                    st.push(node->right);
+                }
+                if (node->left) // 左
+                {
+                    st.push(node->left);
+                }
+                st.push(node); // 中
+                st.push(NULL);
+            }
+            else
+            {
+                st.pop();
+                node = st.top();
+                st.pop();
+                result.push_back(node->val);
+            }
+        }
+        return result;
+    }
+};
