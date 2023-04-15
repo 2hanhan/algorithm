@@ -7,6 +7,7 @@
  *
  * @copyright Copyright (c) 2022
  * - 4.4 快乐数
+ * - 思路是判断各个位上的数字的平方和可能出现无限循环。
  */
 
 #include <unordered_set>

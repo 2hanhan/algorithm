@@ -18,14 +18,14 @@
 #include <vector>
 using namespace std;
 
-class Solution
+class Solution0
 {
 public:
     vector<vector<int>> generateMatrix(int n)
     {
         vector<vector<int>> nnmatirx(n, vector<int>(n, 0));
 
-        //圈数，当前大小
+        // 圈数，当前大小
         int k = 0, count = 1;
         while (k < n / 2)
         {
@@ -54,12 +54,55 @@ public:
             k++;
         }
 
-        //奇数个，单独处理矩阵中心
+        // 奇数个，单独处理矩阵中心
         if (n % 2 == 1)
         {
             nnmatirx[n / 2][n / 2] = count;
         }
         return nnmatirx;
+    }
+};
+
+class Solution
+{
+public:
+    vector<vector<int>> generateMatrix(int n)
+    {
+        int count = 1;
+        vector<vector<int>> res(n, vector<int>(n, n * n));
+
+        for (int i = 0; i < n / 2; i++)
+        {
+            // 起点坐标
+            int x = i;
+            int y = i;
+            //每行短两节
+            for (int j = 0; j < n - 1 - i*2; j++)
+            {
+                res[x][y++] = count;
+                count++;
+            }
+
+            for (int j = 0; j < n - 1 - i*2; j++)
+            {
+                res[x++][y] = count;
+                count++;
+            }
+
+            for (int j = 0; j < n - 1 - i*2; j++)
+            {
+                res[x][y--] = count;
+                count++;
+            }
+
+            for (int j = 0; j < n - 1 - i*2; j++)
+            {
+                res[x--][y] = count;
+                count++;
+            }
+        }
+
+        return res;
     }
 };
 

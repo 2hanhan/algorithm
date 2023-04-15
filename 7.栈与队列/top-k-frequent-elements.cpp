@@ -18,7 +18,7 @@ using namespace std;
 class Solution
 {
 public:
-    // 自定义比较器
+    // 自定义比较器，从大到小排列,小根堆
     class MyComparison
     {
     public:

@@ -18,7 +18,7 @@ using namespace std;
 class Solution
 {
 private:
-    // 自定一个单调队列从大到小 保存了最大(包括N个相等的最大)与次大数
+    // 自定一个单调队列从大到小 保存了最大(包括N个相等的)之后递减的序列
     class MyQueue
     {
     public:
@@ -31,7 +31,7 @@ private:
         }
         void push(int value)
         {
-            // 保存了最大(包括N个相等的最大)与次大数
+            // 保存了最大(包括N个相等的)
             //  把que中小于value的全部删除
             while (!que.empty() && value > que.back())
             {

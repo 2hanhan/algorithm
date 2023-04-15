@@ -15,7 +15,7 @@
 #include <iostream>
 using namespace std;
 
-class MyLinkedList
+class MyLinkedList0
 {
 public:
     struct ListNode
@@ -27,7 +27,7 @@ public:
         ListNode(int x, ListNode *next) : val(x), next(next) {}
     };
 
-    MyLinkedList()
+    MyLinkedList0()
     {
         dummyhead = new ListNode();
         size = 0;
@@ -118,6 +118,102 @@ public:
 private:
     int size;
     ListNode *dummyhead;
+};
+
+class MyLinkedList
+{
+public:
+    struct NodeList
+    {
+        NodeList() : val(0), next(nullptr)
+        {
+        }
+        NodeList(int val_) : val(val_), next(nullptr)
+        {
+        }
+        NodeList(int val_, NodeList *nextnode) : val(val_), next(nextnode)
+        {
+        }
+
+        int val;
+        NodeList *next;
+    };
+
+public:
+    MyLinkedList()
+    {
+        listsize = 0;
+        dummyhead = new NodeList();
+    }
+
+    int get(int index)
+    {
+        if (index > listsize - 1 || index < 0)
+            return -1;
+        NodeList *current = dummyhead;
+        for (int i = 0; i < index; i++)
+        {
+            current = current->next;
+        }
+        return current->next->val;
+    }
+
+    void addAtHead(int val)
+    {
+        addAtIndex(0, val);
+    }
+
+    void addAtTail(int val)
+    {
+        addAtIndex(listsize, val);
+    }
+
+    void addAtIndex(int index, int val)
+    {
+        if(index > listsize)
+            return;
+        NodeList *current = dummyhead;
+        for (int i = 0; i < index; i++)
+        {
+            current = current->next;
+        }
+        NodeList *addnode = new NodeList(val, current->next);
+        current->next = addnode;
+        listsize++;
+    }
+
+    void deleteAtIndex(int index)
+    {
+        if (index > listsize - 1 || index < 0)
+            return;
+        NodeList *current = dummyhead;
+        for (int i = 0; i < index; i++)
+        {
+            current = current->next;
+        }
+
+        NodeList *deletenode = current->next;
+        if (current->next != nullptr)
+            current->next = current->next->next;
+        delete deletenode;
+        listsize--;
+    }
+
+    void showAllNodeList()
+    {
+        NodeList *cur = dummyhead->next;
+        cout << "[";
+        while (cur != NULL)
+        {
+            cout << cur->val << " ";
+            cur = cur->next;
+        }
+        cout << "]" << endl;
+    }
+
+private:
+    NodeList *dummyhead;
+    int listsize;
 };
 
 int main(int argc, char **argv)

@@ -9,9 +9,10 @@
  * - 2. 二分查找
  * - 二分法差值
  * - 确定搜索区间        [left,right]        或者  [left,right)
- * - 起始条件           left = 0,right = n  或者  left = 0,right = -1
- * - 需要主要边界值的更新 left = middle + 1   或者  left = middle + 1
- * - 需要主要边界值的更新 right = middle - 1  或者  right = middle
+ * - 起始条件           left = 0,right = n  或者  left = 0,right = n -1
+ * - 需要注意边界值的更新 left = middle + 1   或者  left = middle + 1
+ * - 需要注意边界值的更新 right = middle - 1  或者  right = middle
+ * - 需要注意终止条件    left <= right       或者  left < right
  */
 
 #include <iostream>

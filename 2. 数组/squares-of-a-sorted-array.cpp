@@ -41,6 +41,55 @@ public:
     }
 };
 
+
+class Solution {
+public:
+    vector<vector<int>> generateMatrix(int n) 
+    {
+        int count = 1;
+        vector<vector<int>> res(n, vector<int>(n, n*n));
+
+        for(int i = 0;i < n/2;n++)
+        {   
+            //四个起点坐标
+            int x1 = i;
+            int y1 = i;
+
+            int x2 = n-1-i;
+            int y2 = i;
+
+            int x3 = n-1-i;
+            int y3 = n-1-i;
+
+            int x4 = i;
+            int y4 = n-1-i;
+            for(int j = 0;j<n-1-i;j++)
+            {
+                res[x1][y1++] = count*count;
+                count++;
+            }
+                        for(int j = 0;j<n-1-i;j++)
+            {
+                res[x2++][y2] = count*count;
+                count++;
+            }
+                        for(int j = 0;j<n-1-i;j++)
+            {
+                res[x3][y3--] = count*count;
+                count++;
+            }
+                        for(int j = 0;j<n-1-i;j++)
+            {
+                res[x4--][y4] = count*count;
+                count++;
+            }
+
+        }
+
+        return res;
+    }
+};
+
 int main(int argc, char **argv)
 {
     int n;
