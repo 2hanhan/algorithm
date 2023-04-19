@@ -15,14 +15,14 @@ using namespace std;
 template <class T>
 void print_arr(std::vector<T> &arr)
 {
-    for (int i = 0; i < arr.size() - 1; i++)
+    for (int i = 0; i < arr.size(); i++)
     {
         cout << arr[i] << " ";
     }
     cout << endl;
 }
 
-//冒泡排序
+// 冒泡排序
 template <class T>
 void bubble_sort(vector<T> &arr)
 {
@@ -76,22 +76,119 @@ void insertion_sort(vector<T> &arr)
     print_arr(arr);
 }
 
+// 递归调用归并排序
+template <class T>
+void merge(vector<T> &arr, int L, int R)
+{
+    if (L == R)
+        return;
+
+    int mid = L + ((R - L) >> 1);
+    merge(arr, L, mid);
+    merge(arr, mid + 1, R);
+
+    int p1 = L;
+    int p2 = mid + 1;
+    vector<T> reuslt;
+    while (p1 <= mid && p2 <= R)
+    {
+        if (arr[p1] <= arr[p2])
+        {
+            reuslt.push_back(arr[p1]);
+            p1++;
+        }
+        else
+        {
+            reuslt.push_back(arr[p2]);
+            p2++;
+        }
+    }
+    while (p1 <= mid)
+    {
+        reuslt.push_back(arr[p1]);
+        p1++;
+    }
+    while (p2 <= R)
+    {
+        reuslt.push_back(arr[p2]);
+        p2++;
+    }
+    for (int i = 0; i < reuslt.size(); i++)
+    {
+        arr[L + i] = reuslt[i];
+    }
+    return;
+}
+
+// 归并排序
+template <class T>
+void merge_sort_ra(vector<T> &arr)
+{
+    print_arr(arr);
+    merge(arr, 0, arr.size() - 1);
+    print_arr(arr);
+}
+
+// 遍历形式的归并排序
+template <class T>
+void merge_sort(vector<T> &arr)
+{
+    print_arr(arr);
+    // 分组2个一组、4个一组 ...
+    int N = arr.size();
+    int mergeSize = 1;
+    while (mergeSize < N)
+    {
+        int L = 0;
+        int R = -1;
+        int M;
+
+        while (L <= N - 1)
+        {
+            // 奇数当前的L M R
+            M = L + mergeSize - 1;
+            R = M + mergeSize;
+            R = R < N - 1 ? R : N - 1;
+            // 合并 L-M M+1->R
+            vector<T> result;
+            int p1 = L;
+            int p2 = M + 1;
+            while (p1 <= M && p2 <= R)
+            {
+                if (arr[p1] <= arr[p2])
+                {
+                    result.push_back(arr[p1++]);
+                }
+                else
+                {
+                    result.push_back(arr[p2++]);
+                }
+            }
+            while (p1 <= M)
+            {
+                result.push_back(arr[p1++]);
+            }
+            while (p2 <= R)
+            {
+                result.push_back(arr[p2++]);
+            }
+            for (int i = 0; i < result.size(); i++)
+            {
+                arr[L + i] = result[i];
+            }
+            L = R + 1;
+        }
+        if (mergeSize > (N >> 1))
+            break;
+        mergeSize = mergeSize << 1;
+    }
+
+    print_arr(arr);
+}
+
 int main(int argc, char **argv)
 {
-    {
-        vector<int> arr{61, 17, 29, 22, 34, 60, 72, 21, 50, 1, 1, 62};
-        selection_sort(arr);
-    }
-
-    {
-        vector<int> arr{61, 17, 29, 22, 34, 60, 72, 21, 50, 1, 1, 62};
-        bubble_sort(arr);
-    }
-
-    {
-        vector<int> arr{61, 17, 29, 22, 34, 60, 72, 21, 50, 1, 1, 62};
-        insertion_sort(arr);
-    }
-
+    vector<int> arr{61, 17, 19, 99, 34, 50, 72, 21, 88, 11, 21, 62};
+    merge_sort(arr);
     return 0;
 }

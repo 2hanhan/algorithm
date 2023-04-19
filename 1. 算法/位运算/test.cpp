@@ -15,9 +15,9 @@ using namespace std;
 
 /**
  * @brief 使用右值引用传递值，方便函数调用啥参数都能传入
- * 
- * @tparam T 
- * @param value 
+ *
+ * @tparam T
+ * @param value
  */
 template <class T>
 void printbit(T &&value)
@@ -29,7 +29,6 @@ void printbit(T &&value)
     {
         for (int i = 7; i >= 0; i--) // 每个byte从最后一位bit开始输出
             cout << ((*p) & (1 << i) ? 1 : 0);
-        cout << endl;
     }
     cout << endl;
 }
@@ -37,24 +36,46 @@ void printbit(T &&value)
 int main(int argc, char **argv)
 {
     // 按照位输出int类型
-    if(0)
+
+    if (0)
     {
         int value = 10;
         printbit(value);
     }
-    cout << "INT_MAX" << INT_MAX << endl;
+
+    // 或运算
+    {
+        int value1 = 1;
+        int value2 = 9;
+        printbit(value1 | value2);
+        printbit(value1 & value2);
+    }
+
     // 取反操作
-    if(0)
+    if (1)
     {
         int value = INT_MAX;
+        printbit(value);
         printbit(1);
         printbit(~value);
-        printbit(value);
         value = -value;
+        printbit(value);
+        value = INT_MIN;
         printbit(value);
     }
 
+    // 移位操作
+    if (0)
+    {
+        int value = 250;
+        printbit(value);
+        printbit(value << 1);
+        printbit((value << 1) | 1);
+        printbit(value >> 1);
+    }
+
     // 测试右值引用
+    if (0)
     {
         int value = 10;
         int &valueleft = value;

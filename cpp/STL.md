@@ -87,15 +87,31 @@ myVec.push_back(value);
 ### unordered_map
 无序容器、哈希映射
 ```c++
+int num = 0;
 int key = 0;
-pair<int, int> keyValue;
-unordered_map<int,int> myMap;
+pair<int, string> keyValue;
+unordered_map<int,string> myMap;
+auto iter = myMap.begin();
 // 插入
 myMap.insert(keyValue);
 //访问
 myMap[key];      //通过重载的[]访问，没有key时value自动插入填充默认值
 //查找
-myMap.find(key);  //查找key,value，返回迭代器，没找到返回myMap.end();
-myMap.count(key); //返回匹配key的个数 
+iter = myMap.find(key);  //查找key,value，返回迭代器，没找到返回myMap.end();
+num =myMap.count(key); //返回匹配key的个数 
+//删除
+num = myMap.erase(key); //根据key删除，返回成功删除的键值对的数量。
+iter = myMap.erase(iter);//根据迭代器，返回一个指向被删除键值对之后位置的迭代器
+iter = myMap.erase(iter,myMap.end());//更加迭代器范围删除，返回一个指向被删除的最后一个键值对之后一个位置的迭代器。
+//删除容器内所有键值对
+myMap.clear();
+```
 
+### map
+有序容器，红黑树
+```c++
+int num = 0;
+int key = 0;
+map<int,string> myMap;
+auto iter = myMap.begin();
 ```
