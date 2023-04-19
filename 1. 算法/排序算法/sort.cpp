@@ -22,6 +22,7 @@ void print_arr(std::vector<T> &arr)
     cout << endl;
 }
 
+//冒泡排序
 template <class T>
 void bubble_sort(vector<T> &arr)
 {

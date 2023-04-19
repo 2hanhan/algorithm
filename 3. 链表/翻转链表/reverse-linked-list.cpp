@@ -26,28 +26,30 @@ struct ListNode
 };
 
 // 方法1：
-// class Solution
-// {
-// public:
-//     ListNode *reverseList(ListNode *head)
-//     {
-//         ListNode *temp; // 保存cur的下一个节点
-//         ListNode *cur = head;
-//         ListNode *pre = NULL;
+class Solution1
+{
+public:
+    ListNode *reverseList(ListNode *head)
+    {
+        ListNode *temp; // 保存cur的下一个节点
+        ListNode *cur = head;
+        ListNode *pre = NULL;
 
-//         while (cur != NULL)
-//         {
-//             temp = cur->next;
-//             cur->next = pre;
-//             pre = cur;
-//             cur = temp;
-//         }
-//         return pre;
-//     }
-// };
+        while (cur != NULL)
+        {
+            temp = cur->next; // 记录next防止翻转丢失
+            cur->next = pre;  // 翻转
+
+            // 更新pre和cur准备下一次翻转
+            pre = cur;
+            cur = temp;
+        }
+        return pre;
+    }
+};
 
 // 方法2：
-class Solution
+class Solution2
 {
 public:
     ListNode *reverse(ListNode *pre, ListNode *cur)
@@ -66,23 +68,25 @@ public:
 };
 
 // 方法3：
-// class Solution
-// {
-// public:
-//     ListNode *reverseList(ListNode *head)
-//     {
-//         if (head == NULL)
-//             return NULL;
-//         if (head->next == NULL)
-//             return head;
+// 递归调用
+// 返回值是新的头节点，功能是翻转当前的节点的下一个节点
+class Solution
+{
+public:
+    ListNode *reverseList(ListNode *head)
+    {
+        if (head == NULL)
+            return NULL;
+        if (head->next == NULL)
+            return head;
 
-//         ListNode *last = reverseList(head->next);
-//         head->next->next = head;
-//         head->next = NULL;
+        ListNode *last = reverseList(head->next);
+        head->next->next = head; // 翻转当前节点的下一个节点
+        head->next = NULL;       // 翻转不会丢失因为递归栈有存储每个节点的前一个
 
-//         return last;
-//     }
-// };
+        return last;
+    }
+};
 
 int main(int argc, char **argv)
 {
