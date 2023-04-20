@@ -10,6 +10,8 @@
  */
 #include <iostream>
 #include <vector>
+#include <cstdlib>
+#include <time.h>
 using namespace std;
 
 template <class T>
@@ -27,7 +29,6 @@ template <class T>
 void bubble_sort(vector<T> &arr)
 {
     cout << "冒泡排序" << endl;
-    print_arr(arr);
     for (int i = 0; i < arr.size(); i++)
     {
         for (int j = 0; j < arr.size() - i - 1; j++)
@@ -36,7 +37,6 @@ void bubble_sort(vector<T> &arr)
                 swap(arr[j], arr[j + 1]); // 两两交换
         }
     }
-    print_arr(arr);
 }
 
 // 选择排序
@@ -44,7 +44,6 @@ template <class T>
 void selection_sort(std::vector<T> &arr)
 {
     cout << "选择排序" << endl;
-    print_arr(arr);
     for (int i = 0; i < arr.size() - 1; i++)
     {
         int min = i;
@@ -53,7 +52,6 @@ void selection_sort(std::vector<T> &arr)
                 min = j;             // 当前i到n-1位置最小的下标
         std::swap(arr[i], arr[min]); // 交换
     }
-    print_arr(arr);
 }
 
 // 插入排序
@@ -61,7 +59,6 @@ template <class T>
 void insertion_sort(vector<T> &arr)
 {
     cout << "插入排序" << endl;
-    print_arr(arr);
     for (int i = 1; i < arr.size(); i++)
     {
         int value = arr[i]; // 当前位置的数
@@ -73,7 +70,6 @@ void insertion_sort(vector<T> &arr)
         }
         arr[j + 1] = value; // 插入到不比当前数大的位置的后面
     }
-    print_arr(arr);
 }
 
 // 递归调用归并排序
@@ -120,20 +116,17 @@ void merge(vector<T> &arr, int L, int R)
     return;
 }
 
-// 归并排序
+// 归并排序 递归形式
 template <class T>
 void merge_sort_ra(vector<T> &arr)
 {
-    print_arr(arr);
     merge(arr, 0, arr.size() - 1);
-    print_arr(arr);
 }
 
-// 遍历形式的归并排序
+// 归并排序 遍历形式
 template <class T>
 void merge_sort(vector<T> &arr)
 {
-    print_arr(arr);
     // 分组2个一组、4个一组 ...
     int N = arr.size();
     int mergeSize = 1;
@@ -182,13 +175,55 @@ void merge_sort(vector<T> &arr)
             break;
         mergeSize = mergeSize << 1;
     }
+}
 
-    print_arr(arr);
+template <class T>
+void partition(vector<T> &arr, int L, int R)
+{
+    if (L >= R)
+        return;
+
+    // 随机快排 随机选取基准放到最右边
+    srand((unsigned)time(NULL));
+    int rand_num = rand() % (R - L + 1) + L;
+    swap(arr[R], arr[rand_num]);
+
+    // 分两部分
+    int ML = L - 1, MR = R;
+    int i = L;
+    while (i < MR)
+    {
+        if (arr[i] < arr[R])
+        {
+            swap(arr[++ML], arr[i++]); // 放入小于区域，小于区域+1，下一个
+        }
+        else if (arr[i] > arr[R])
+        {
+            swap(arr[--MR], arr[i]); // 放入大于区域，大于区域+1，因为从大于区域取来一个新的每判断，不要跳下一个
+        }
+        else
+        {
+            i++; // 相等的直接下一个
+        }
+    }
+    // 交换 R 与 MR
+    swap(arr[R], arr[MR]);
+
+    // 递归调用
+    partition(arr, L, ML);
+    partition(arr, MR + 1, R); // 因为MR包含了原来的arr[R]所以多了一位
+}
+
+// 快速排序
+template <class T>
+void quick_sort_ra(vector<T> &arr)
+{
+    partition(arr, 0, arr.size() - 1);
 }
 
 int main(int argc, char **argv)
 {
-    vector<int> arr{61, 17, 19, 99, 34, 50, 72, 21, 88, 11, 21, 62};
-    merge_sort(arr);
+    vector<int> arr{61, 17, 12, 19, 99, 41, 34, 50, 72, 21, 88, 11, 21, 62};
+    quick_sort_ra(arr);
     return 0;
 }

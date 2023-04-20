@@ -55,7 +55,8 @@ priority_queue<int, vector<int, int>, MyComparison> myPri_que;
 int x = myPri_que.top();
 myPri_que.pop();
 //插入自动排序
-myPri_que.push(value)
+myPri_que.push(value)//插入操作
+myPri_que.emplace(10);//也是插入操作，直接构造，节省了拷贝复制的时间
 ```
 
 
