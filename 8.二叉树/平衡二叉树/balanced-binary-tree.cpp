@@ -30,7 +30,7 @@ struct TreeNode
     TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
 };
 
-class Solution
+class Solution1
 {
 public:
     vector<int> getBalancedAndDepth(TreeNode *node)
@@ -56,5 +56,30 @@ public:
     bool isBalanced(TreeNode *root)
     {
         return getBalancedAndDepth(root)[0];
+    }
+};
+
+
+class Solution2 {
+public:
+    pair<bool,int>getIsBalancedAndHeight(TreeNode* root)
+    {
+        if(root == nullptr)
+            return make_pair(1,0);
+        
+        pair<bool,int> left = getIsBalancedAndHeight(root->left);
+        pair<bool,int> right = getIsBalancedAndHeight(root->right);
+
+        pair<bool,int> result;
+        int height = max(left.second,right.second)+1;
+        bool IsBalanced = true;
+        if((!(left.first&&right.first))||(abs(left.second-right.second)>1))
+            IsBalanced = false;
+        return make_pair(IsBalanced,height);
+    }
+
+    bool isBalanced(TreeNode* root) {
+        return getIsBalancedAndHeight(root).first;
+
     }
 };
