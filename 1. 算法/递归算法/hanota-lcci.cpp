@@ -35,7 +35,7 @@ void printall(T &mySTL)
     }
 }
 
-// 递归散发
+// 递归算法
 class Solution
 {
 public:
