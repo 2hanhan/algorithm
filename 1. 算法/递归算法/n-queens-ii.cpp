@@ -1,12 +1,12 @@
 /**
- * @file n-queens.cpp
+ * @file n-queens-ii.cpp
  * @author your name (you@domain.com)
  * @brief
  * @version 0.1
  * @date 2023-04-22
- * N 皇后问题 返回所有具体的解
+ * N 皇后问题 返回解的个数
+ * https://leetcode.cn/problems/n-queens-ii/
  *
- * https://leetcode.cn/problems/n-queens/
  * @copyright Copyright (c) 2023
  *
  */
@@ -16,30 +16,7 @@
 #include <string>
 using namespace std;
 
-void printall2(vector<vector<string>> &result)
-{
-    for (int i = 0; i < result.size(); i++)
-    {
-        for (int j = 0; j < result[i].size(); j++)
-        {
-            cout << result[i][j] << endl;
-        }
-        cout << endl;
-    }
-}
-
-template <class T>
-void printall(T &mySTL)
-{
-    cout << endl
-         << typeid(mySTL).name() << ":";
-    for (auto iter = mySTL.begin(); iter != mySTL.end(); iter++)
-    {
-        cout << *iter << " ";
-    }
-}
-
-class Solution
+class Solution0
 {
 public:
     void putQueens(vector<int> &position, vector<vector<int>> &result, int n)
@@ -101,16 +78,53 @@ public:
     }
 };
 
+class Solution
+{
+public:
+    int getNQueens(const int &limit, int colLim, int leftDiaLim, int rightDiaLim)
+    {
+        // 如果colLim占满了
+        if (limit == colLim)
+            return 1;
+
+        // 可以放置Queen的位
+        int pos = limit & (~(colLim | leftDiaLim | rightDiaLim));
+
+        int result = 0;
+        while (pos != 0)
+        {
+            int mostRightOne = pos & (~pos + 1);// 可以放置的pos的最右侧一位
+            pos = pos - mostRightOne;
+            result += getNQueens(limit,
+                                 colLim | mostRightOne,//当前放置过的列
+                                 (mostRightOne | leftDiaLim) << 1,//之前存在过的列的左对角线|当前放置过的列的左对角线
+                                 (mostRightOne | rightDiaLim) >> 1);//之前存在过的列的右对角线|当前放置过的列的右对角线
+        }
+        return result;
+    }
+
+    int totalNQueens(int n)
+    {
+
+        int limit = n == 32 ? -1 : ((1 << n) - 1); // 1的位代表需要放置
+        return getNQueens(limit, 0, 0, 0);
+    }
+};
+
 int main()
 {
     vector<int> A, B, C;
     int N;
     cout << "输入皇后个数 N:";
     cin >> N;
+    Solution0 solution0;
+    auto result0 = solution0.solveNQueens(N);
+    int num0 = result0.size();
+    cout << "Num0:" << num0 << endl;
+
     Solution solution;
-    auto result = solution.solveNQueens(N);
-    cout << endl;
-    printall2(result);
+    int result = solution.totalNQueens(N);
+    cout << "result:" << result << endl;
     cout << endl;
     return 0;
 }
