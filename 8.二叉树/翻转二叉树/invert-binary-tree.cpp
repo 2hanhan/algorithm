@@ -107,3 +107,20 @@ public:
         return root;
     }
 };
+
+
+// 递归序的后序
+class Solution3 {
+public:
+    TreeNode* invertTree(TreeNode* root) 
+    {
+        //个人感觉递归序的后序能翻转二叉树尝试一下
+        if(root == nullptr)
+            return root;
+        invertTree(root->left);
+        invertTree(root->right);
+        swap(root->left,root->right);
+        return root;
+
+    }
+};
