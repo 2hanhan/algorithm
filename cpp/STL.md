@@ -113,6 +113,12 @@ myMap.clear();
 ```c++
 int num = 0;
 int key = 0;
-map<int,string> myMap;
+map<int, int> myMap;
+pair<int, int> keyValue;
 auto iter = myMap.begin();
+
+// 插入 
+myMap.insert(keyValue);
+// 查找
+iter = myMap.find(key) //查询key，如果找到返回迭代器，找不到返回myMap.end()
 ```
