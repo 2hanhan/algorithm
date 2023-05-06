@@ -74,7 +74,8 @@ public:
         if (leftDepth == rightDepth)
         {
             // 左移一位相当于*2
-            return (2 << leftDepth) - 1;
+            return (2 << leftDepth) - 1;//左右的深度相等，说明是满树，个数为 2^n - 1
+
         }
 
         // 不是满二叉树的，则分块计算

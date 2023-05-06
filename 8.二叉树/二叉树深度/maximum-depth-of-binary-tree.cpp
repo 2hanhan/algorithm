@@ -9,6 +9,7 @@
  * @copyright Copyright (c) 2023
  *
  */
+#include <iostream>
 #include <stack>
 #include <queue>
 #include <vector>
@@ -72,3 +73,47 @@ public:
         return depth;
     }
 };
+
+
+int main(int argc, char **argv)
+{
+    TreeNode *root;
+    int x[] = {1, 2, 3, 4, NULL, NULL, 5};
+
+    int i = 0;
+    int size = sizeof(x) / 4;
+    cout << size;
+    if (size > 0)
+        root = new TreeNode(x[i]);
+
+    queue<TreeNode *> mySt;
+    mySt.push(root);
+    while (!mySt.empty())
+    {
+        TreeNode *node = mySt.front();
+        mySt.pop();
+        if (i < size - 1 && x[++i] != NULL)
+        {
+
+            TreeNode *left = new TreeNode(x[i]);
+            node->left = left;
+            mySt.push(left);
+        }
+        if (i < size - 1 && x[++i] != NULL)
+        {
+
+            TreeNode *right = new TreeNode(x[i]);
+            node->right = right;
+            mySt.push(right);
+        }
+    }
+
+    int result;
+    Solution1 solution1;
+    result = solution1.maxDepth(root);
+    cout << "soulution:" << result << endl;
+
+    cout << endl;
+
+    return 0;
+}

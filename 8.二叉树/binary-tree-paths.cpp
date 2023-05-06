@@ -4,8 +4,8 @@
  * @brief
  * @version 0.1
  * @date 2023-01-13
+ * 257. 二叉树的所有路径
  * https://leetcode.cn/problems/binary-tree-paths/
- * 二叉树的所有路径
  * 给你一个二叉树的根节点 root ，按 任意顺序 ，返回所有从根节点到叶子节点的路径。
  * 叶子节点 是指没有子节点的节点。
  * @copyright Copyright (c) 2023
