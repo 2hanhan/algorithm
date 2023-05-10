@@ -8,3 +8,4 @@
 1. [《代码随想录》](https://space.bilibili.com/525438321/channel/collectiondetail?sid=180037)
 
 2. [LeetCode左程云](https://www.bilibili.com/video/BV1UB4y1S7dF/?p=1)
+> 这里面的对于暴力递归总结的很彻底。
