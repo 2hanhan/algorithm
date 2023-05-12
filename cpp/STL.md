@@ -121,4 +121,6 @@ auto iter = myMap.begin();
 myMap.insert(keyValue);
 // 查找
 iter = myMap.find(key) //查询key，如果找到返回迭代器，找不到返回myMap.end()
+
+myMap.count(key);//查询key，如果找到返回1，找不到返回0
 ```
