@@ -11,6 +11,7 @@
 #include <iostream>
 #include <typeinfo>
 
+#include <list>
 #include <queue>
 #include <string>
 #include <unordered_map>
@@ -45,7 +46,7 @@ void test_unordered_map()
 
 void test_priority_queue()
 {
-    priority_queue<int> priQue;           // 从小到大方法，大根堆
+    priority_queue<int> priQue;                        // 从小到大方法，大根堆
     priority_queue<int, vector<int>, less<int>> myQue; // 从小到大方法，大根堆
 
     vector<int> myVector{9, 1, 2, 5, 7, 4, 3, 6, 8};
@@ -76,9 +77,33 @@ void test_priority_queue()
     }
 }
 
+void test_list()
+{
+    cout << "test_list";
+
+    list<int> myList(5, -1);
+    printall(myList);
+
+    list<int>::iterator iter = myList.begin();
+    int num = 15;
+    while (num > 0)
+    {
+        iter++;
+        if (iter == myList.end())
+            cout << endl
+                 << num
+                 << "iter == myList.end()";
+        num--;
+    }
+    //迭代器++超过end()后会从begin()重新开始
+
+    myList.insert(iter, 10);
+    printall(myList);
+}
+
 int main(int argc, char **argv)
 {
-    test_priority_queue();
+    test_list();
     cout << endl;
     return 0;
 }

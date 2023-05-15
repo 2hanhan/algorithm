@@ -61,6 +61,20 @@ myPri_que.emplace(10);//也是插入操作，直接构造，节省了拷贝复�
 
 
 ## 顺序容器
+### list
+```c++
+int size = 10
+int value = 0;
+
+list<int> myList(10);//10个默认值为0
+list<int> myList(size, value);//size个默认值为value
+list<int>::iterator iter  = myList.begin();
+
+myList.insert(iter,value);//向iter位置插入元素，iter之后的元素后移
+
+
+```
+
 ### deque
 双向队列
 ```c++
@@ -124,3 +138,7 @@ iter = myMap.find(key) //查询key，如果找到返回迭代器，找不到返�
 
 myMap.count(key);//查询key，如果找到返回1，找不到返回0
 ```
+
+
+# 迭代器
+> 测试下来的迭代器超过end()会从begin()重新开始，至少list是这样

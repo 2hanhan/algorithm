@@ -54,6 +54,7 @@
         "unordered_set": "cpp",
         "stack": "cpp",
         "queue": "cpp",
-        "set": "cpp"
+        "set": "cpp",
+        "list": "cpp"
     }
 }
