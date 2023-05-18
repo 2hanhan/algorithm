@@ -4,6 +4,8 @@
  * @brief
  * @version 0.1
  * @date 2022-12-05
+ * 209. 长度最小的子数组
+ * https://leetcode.cn/problems/minimum-size-subarray-sum/
  * - 长度最小的子数组
  * - j是划窗右端点，for循环变量j
  * - i是划窗左端点，每次判断是否更新minnums

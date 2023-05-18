@@ -4,6 +4,7 @@
  * @brief
  * @version 0.1
  * @date 2023-04-13
+ * 26. 删除有序数组中的重复项
  * https://leetcode.cn/problems/remove-duplicates-from-sorted-array/
  * @copyright Copyright (c) 2023
  *

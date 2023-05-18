@@ -4,7 +4,8 @@
  * @brief
  * @version 0.1
  * @date 2022-12-05
- * - 3.移除元素
+ * 27. 移除元素
+ * https://leetcode.cn/problems/remove-element/
  * - 双指针移除制定元素
  * @copyright Copyright (c) 2022
  *
