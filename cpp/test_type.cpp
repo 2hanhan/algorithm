@@ -30,14 +30,19 @@ int main(int argc, char **argv)
     // memset(arr2,-1,sizeof(arr2));
     // cout << arr2[1][1] << endl;
 
-    int arr3[2][3];
-    cout << arr3[1][1] << endl;
+    // int arr3[2][3];
+    // cout << arr3[1][1] << endl;
 
-    cout << sizeof(arr3) << endl;
-    cout << sizeof(int) << endl;
+    // cout << sizeof(arr3) << endl;
+    // cout << sizeof(int) << endl;
 
-    fill(arr3[0], arr3[0] + sizeof(arr3)/sizeof(int), 990);
-    cout << arr3[1][1] << endl;
+    // fill(arr3[0], arr3[0] + sizeof(arr3)/sizeof(int), 990);
+    // cout << arr3[1][1] << endl;
+
+    float x = -0.02;
+    float size = 0.2;
+    int64_t index = x/size;
+    cout<<index<<endl;
 
     cout << endl;
     return 0;
