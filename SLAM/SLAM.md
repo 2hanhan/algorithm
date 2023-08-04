@@ -1,7 +1,7 @@
 ---
 markmap:
-  colorFreezeLevel: 9
-  initialExpandLevel: 7
+  colorFreezeLevel: 50
+  initialExpandLevel: 10
   maxWidth: 500
 ---
 
@@ -17,7 +17,7 @@ markmap:
 #### 2D-3D
 ##### PnP Perspective-n-Point[详情参考](https://zhuanlan.zhihu.com/p/399140251)
 ###### 直接线性变换DLT Direct Linear Transform
-- $$
+- $
 \omega\begin{pmatrix}u
  \\v
  \\1
@@ -30,7 +30,7 @@ t_9 &t_{10}&t_{11}  &t_{12}
  \\z
  \\1
 \end{pmatrix}
-$$
+$
 - 待求$t$共12个参数、最少6对匹配点
 - 没有考虑旋转矩阵$R$本身的性质
 ###### P3P
@@ -38,7 +38,7 @@ $$
 - 仅仅使用3对点的匹配信息，容易受到噪声影响
 ###### EPnP
 - 控制点$c$选择$p = \sum_{j}^{4} c_{ij}*\alpha_{ij}$
-- $$\omega\begin{pmatrix}u
+- $\omega\begin{pmatrix}u
  \\v
  \\1
 \end{pmatrix} = \begin{pmatrix}
@@ -51,11 +51,11 @@ t_9 &t_{10}&t_{11}  &t_{12}
  \\y
  \\z
  \\1
-\end{pmatrix}$$
+\end{pmatrix}$
 - 与P3P类似，使用PCA获取4个控制点（不共面），计算其在相机系下的坐标，然后通过ICP求解坐标变化
 
 ###### BA Bundle Adjustment
-- $$T^* = argmin \sum_{i}^{n} \left \|p_i-\frac{1}{\omega_i}KTP_{wi}   \right \| ^2$$
+- $T^* = argmin \sum_{i}^{n} \left \|p_i-\frac{1}{\omega_i}KTP_{wi}   \right \| ^2$
 - 重投影误差构建非线性优化问题，误差关于位姿的导数迭代求得所有对应点重投影误差之和最小的位姿估计。
 ### 提取关键帧
 ## 后端优化
@@ -86,10 +86,12 @@ $$
 - $\Delta x=-\lambda J$
 - 是下降算法。容易出现锯齿现象，增加迭代的次数
 ### 牛顿法
-- 二阶泰勒展开的数值最小，一般是对$\Delta x$求导导数为0的极值点|$J+H\Delta = 0$
+- 二阶泰勒展开的数值最小，一般是对$\Delta x$求导导数为0的极值点。
+- $J+H\Delta = 0$
 - 是下降算法。需要计算H矩阵，计算量大
 ### 高斯牛顿法
-- 思路使用$f(x)$的雅可比矩阵$J(x)J^T(x)$近似$H$矩阵。$f(x +\Delta x)  = f(x) + J(x)^T \Delta x$。带入计算后使得导数为0可得到：$$J(x)J^T(x) \Delta x = - J(x)f(x) \Rightarrow H(x)\Delta x = g(x)$$
+- 思路使用$f(x)$的雅可比矩阵$J(x)J^T(x)$近似$H$矩阵。$f(x +\Delta x)  = f(x) + J(x)^T \Delta x$。带入计算后使得导数为0可得到：
+- $J(x)J^T(x) \Delta x = - J(x)f(x) \Rightarrow H(x)\Delta x = g(x)$
 - 避免了计算$H$导致的计算量过大的问题|使用$J(x)J^T(x)$近似的$H(x)$半正定肯出现奇异病态；近似的$H(x)$只在$x$附近效果不错，可能出现求解得到的$\Delta x$的步长过大，局部的近似不准确的问题。
 ### LM优化算法
 - 考虑到高斯牛顿法近似不准确，给定一个近似的信赖区间半径$\mu$，并根据$\rho = \frac{f(x + \Delta x)-f(x)}{J^T(x)\Delta x}$指标判断$\mu$的好坏，$\rho$大于一定值可以增加$\mu$半径，反之亦然。
@@ -101,6 +103,7 @@ $$
 # 滤波
 
 # 李群李代数
+- 一种指数映射
 ## 求导数
 ### 左扰动
 ### 右扰动
