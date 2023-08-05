@@ -8,10 +8,53 @@ markmap:
 # SLAM
 ## 传感器输入
 ### 相机
-#### 相机参数
+#### 相机模型
+##### 针孔模型
+###### 内参模型
+- 相机内参$K$:$\begin{pmatrix}
+f_x&0  &c_x \\
+0  &f_y&c_y \\
+0  &0  &1
+\end{pmatrix}$
+- 归一化坐标:$\begin{bmatrix}
+ X/Z &Y/Z  &1
+\end{bmatrix}^T$
+- 像素坐标:$\begin{pmatrix}
+u\\
+v\\
+1\\
+\end{pmatrix}=\frac{1}{Z} \begin{pmatrix}
+f_x&0  &c_x \\
+0  &f_y&c_y \\
+0  &0  &1
+\end{pmatrix}\begin{pmatrix}
+X\\
+Y\\
+Z\\
+\end{pmatrix}=\frac{1}{Z} KP$
+###### 畸变模型
+- 径向畸变:$\begin{matrix}
+x_{distorted} = x(1+k_1r^2+k_2r^4+k_3r^6)\\
+y_{distorted} = y(1+k_1r^2+k_2r^4+k_3r^6)
+\end{matrix}$
+- 切向畸变:$\begin{matrix}
+x_{distorted} = x+2p_1xy+p_2(r^2+2x^2)\\
+y_{distorted} = y+p_1(r^2+2y^2)+2p_2xy
+\end{matrix}$
+- 畸变后的归一化坐标:$\begin{matrix}
+x_{distorted} = x(1+k_1r^2+k_2r^4+k_3r^6)+2p_1xy+p_2(r^2+2x^2)\\
+y_{distorted} = y(1+k_1r^2+k_2r^4+k_3r^6)+p_1(r^2+2y^2)+2p_2xy
+\end{matrix}$
+- 畸变后的像素坐标:$\begin{matrix}
+u=f_xx_{distorted}+c_x\\
+v=f_yy_{distorted}+c_y
+\end{matrix}$
 #### 相机类型
 ##### 单目RGB
 ##### 双目RGB
+###### 双目相机模型
+- 相似三角形关系:$\frac{z-f}{z} = \frac{b-u_L+u_R}{b} $,其中$b$是双目相机的基线，两个水平放置的相机光圈在x轴上的距离。
+- 深度值$z$:z = \frac{fb}{d},d\overset{def}{=}u_L-u_R
 ##### 深度图像RGB-D
 ### IMU
 #### IMU参数
@@ -145,6 +188,19 @@ $
 - $s_2x_2=s_1Rx_1+t$
 - 通过同时乘$x_2^\wedge$可以得到: $0 = s_2x_2^\wedge x_2=s_1x_2^\wedge Rx_1+ x_2^\wedge t$，可以依次计算获得s_1$和$s_2$。
 
+# 状态估计
+- SLAM求解的是当前$k$时刻状态$x_k$，可以看做一个状态估计问题。
+## 状态估计问题定义
+- 运动方程:$x_k = f(x_{k-1},u_k)+w_k$，$x$是状态量，$w_k$是噪声
+- 观测方程:$z_{k,j}=h(y_j,x_k)+v_{k,j}$，$z$是观测量，$y是观测路标$，$v_{k,j}$是噪声
+## 最大后验估计 Maximum A Posteriori MAP
+- 求解$x,y$的最优解:$x = arg\max_{x} p(x,y|z,u)$
+- 通过贝叶斯公式可以表示为$似然*先验$的形式:$p(x,y|z,u) = \frac{p(z,u|x,y)p(x,y)}{p(z,u)}\propto  p(z,u|x,y)p(x,y)$
+- 由于先验$p(x,y)$无法计算，就只考虑似然$p(z,u|x,y)$，所以MAP问题变成了极大似然估计
+### 极大似然Maximize Likelihood Estimation MLE
+- 转换后的:$x,y = arg \max_{x,y}p(z,u|x,y) = arg \max_{x,y} \prod_{k}p(u_k|x_k-1,x_k)\prod_{k,j} p(z_{k,j}|x_k,y_j)$
+- 误差模型:$e_{u,k}=x_k-f(x_{k-1},u_k),e_{z,k,j} = z_{k,j} - h(x_k,y_j)$
+- 通过取对数可以转换为:$x,y=min_{x,y}\sum_ke^T_{u,k}R_k^{-1}e_{u,k} + \sum_k\sum_je^T_{z,k,j}Q_{k,j}^{-1}e_{z,k,j}$，等价为误差模型的最小二乘问题。
 
 # 优化
 
@@ -176,6 +232,7 @@ $$
 ## 优化库
 ### g2o
 ### ceres
+
 # 滤波
 
 
