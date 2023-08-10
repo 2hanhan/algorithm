@@ -190,14 +190,17 @@ $
 
 
 ## 后端优化
+### 滑窗优化 Slide Window
 ### 局部优化 Loacl Bundle Adjustment
 ### 全局优化 Global Bundle Adjustment
 #### 位姿图优化
+
+
 ## 建图
 ### 三角测量 三角化
 - 用来恢复观测物体or观测点的3D位置信息
 - $s_2x_2=s_1Rx_1+t$
-- 通过同时乘$x_2^\wedge$可以得到: $0 = s_2x_2^\wedge x_2=s_1x_2^\wedge Rx_1+ x_2^\wedge t$，可以依次计算获得s_1$和$s_2$。
+- 通过同时乘$x_2^\wedge$可以得到: $0 = s_2x_2^\wedge x_2=s_1x_2^\wedge Rx_1+ x_2^\wedge t$，可以依次计算获得$s_1$和$s_2$。
 
 ## 回环检测
 ### 检测
@@ -285,6 +288,19 @@ $$
 - 考虑到高斯牛顿法近似不准确，给定一个近似的信赖区间半径$\mu$，$||D \Delta x||^2 \le μ$，$D$为系数矩阵。根据$\rho = \frac{f(x + \Delta x)-f(x)}{J^T(x)\Delta x}$指标判断$\mu$的好坏，$\rho$约接近1近似效果好。$\rho$大于一定值可以增加$\mu$半径，反之亦然。
 - 通过拉格朗日乘子法将收敛区间融合到目标函数中。求解无约束问题$\mathcal{L}(\Delta x , \lambda) = \frac{1}{2}\left \| f(x) +J^T\Delta x \right \|^2  +\frac{\lambda}{2}(\left \| D\Delta x \right \|^2-\mu )$，化简得到：$(H(x) + \lambda D^TD) \Delta x= g(x)$
 - 相比于高斯牛顿法多了$\lambda D^TD$，可以将$ D^TD$近似为单位矩阵 $I$进行简化,$\lambda$比较小时，近似于高斯牛顿法；。$\lambda$比较大的时候，$\lambda I$占主要地位，近似于最速度下降法。
+
+## 稀疏性 和 边缘化 Marginalizatio (Schur消元)
+### 稀疏性
+- 定义：通常来说求解$H \Delta x = g$时候，$H = \sum J_{i,j}TJ_{i,j}$，如果按照先相机，后观测点的顺序，不同的两个观测点对应位置的矩阵块是为0的，这个就是一般所说H矩阵的稀疏性。
+- 利用稀疏性可以加速矩阵计算，这个假设加速计算过程称为边缘化(Marginalization)或者Schur消元。
+### 边缘化 Marginalizatio (Schur消元)
+- $H \Delta x = g$ 可以写成分块的形式- $\begin{bmatrix}B&E \\E^T&C\end{bmatrix} \begin{bmatrix}\Delta x_c\\\Delta x_p\end{bmatrix} =
+\begin{bmatrix}v\\w\end{bmatrix}$
+- Schur消元：消除右上角的矩阵$E$，方程变为$\begin{bmatrix}B - EC^{-1}E^T&0 \\E^T&C\end{bmatrix} \begin{bmatrix}\Delta x_c\\\Delta x_p\end{bmatrix} =
+\begin{bmatrix}v -EC^{-1}w \\w\end{bmatrix}$
+- 求解：1.求解第一行$\begin{bmatrix}B - EC^{-1}E^T&0 \end{bmatrix} \begin{bmatrix}\Delta x_c\end{bmatrix} =
+\begin{bmatrix}v -EC^{-1}w \end{bmatrix}$得到相机状态$\Delta x_c$。2.将$\Delta x_c$带入，通过第二行求解$\Delta x_p = C^{-1}\left (w -E^T \Delta x_c \right ) $
+- 边缘化 Marginalizatio：是因为上说求解过程，可以看做是先固定$\Delta x_p$求解$\Delta x_c$，从概率上看是求解$P(x_c,x_p) = P(x_c|x_p)P(x_p)$，就是把$x_p$边缘化。
 
 ## 优化库
 ### g2o
