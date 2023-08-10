@@ -2,10 +2,10 @@
 markmap:
   colorFreezeLevel: 50
   initialExpandLevel: 10
-  maxWidth: 500
+  maxWidth: 600
 ---
 
-# SLAM
+# VSLAM
 ## 传感器输入
 ### 相机
 #### 相机模型
@@ -54,7 +54,7 @@ v=f_yy_{distorted}+c_y
 ##### 双目RGB
 ###### 双目相机模型
 - 相似三角形关系:$\frac{z-f}{z} = \frac{b-u_L+u_R}{b} $,其中$b$是双目相机的基线，两个水平放置的相机光圈在x轴上的距离。
-- 深度值$z$:z = \frac{fb}{d},d\overset{def}{=}u_L-u_R
+- 深度值$z = \frac{fb}{d}$，视差$d\overset{def}{=}u_L-u_R$，$b$是基线
 ##### 深度图像RGB-D
 ### IMU
 #### IMU参数
@@ -64,6 +64,8 @@ v=f_yy_{distorted}+c_y
 ### 外参标定
 
 ## 前端里程计 Visual Odometry
+### 图像预处理
+
 ### 特征提取
 - 外观相似的特征应该具有相似的描述子
 
@@ -74,7 +76,16 @@ v=f_yy_{distorted}+c_y
 - BRIEF描述子
 - 使用FAST关键点的方向计算Steer BRIEF获得ORB描述子的旋转不变性
 #### SIFT特征 Scale-Invariant Featrue Transform尺度不变特征变化
+- 先进行非极大抑制，再去除低对比度的点，再通过Hessian矩阵去除边缘响应过大的点。
+- 利用不同尺寸的图像与高斯差分滤波器卷积
+- 在正方形区域内统计梯度幅值的直方图，直方图最大值对应主方向，可以有多个主方向
+- 描述子：128维度:$4*4*8$
+- 旋转、尺度、亮度不变性，对视角、仿射变换、噪声保持稳定性
 #### SURF特征
+- 先利用Hessian矩阵确定候选点，然后进行非极大抑制
+- 利用原图片与不同尺寸的方框滤波器(box filter)卷积。
+- 在圆形区域内计算各个扇形范围内x、y方向的haar小波响应，模最大的扇形方向作为主方向
+- 描述子：64维度:$4*4*4$
 
 ### 特征匹配
 #### 基于描述子
@@ -98,12 +109,12 @@ v=f_yy_{distorted}+c_y
 - $x_1=K^{-1}p_1、x_2=K^{-1}p_2$
 其中$p_1、p_2$是像素坐标、$x_2、x_1$是两个像素点归一化平面坐标。
 ###### 求解E的齐次线性方程组
-- 八点法，$t^\wedge R$共9个参数，线性方程组求解需要8个方程，每对匹配点可以构建一个方程，所有至少需要8个点。
-- 可以使用SVD分解的方式求解齐次线程方程组
+- 八点法，$t^\wedge R$共9个参数，线性方程组求解需要8个方程，每对匹配点可以构建一个方程，所有至少需要8对点。
+- 可以使用SVD分解的方式求解齐次线程方程组，SVD分解会得到四组解，可以验证深度为正值进行筛选。
 - 为了使$E$满足性质可以对八点法的E进行SVD分解、获取特征值$[\sigma_1,\sigma_2,\sigma_3]^T$，其中$\sigma_1>=\sigma_2>=\sigma_3$,取$E^* = Udiag((\sigma_1+\sigma_2)/2,(\sigma_1+\sigma_2)/2,0)$
 
 ##### 单应矩阵H
-
+- 用来描述两个平面之间的映射关系。如果匹配点都落入同一个平面上则可以通过单应矩阵求解2D-2D的对极几何。
 - 约束关系:$p_2\simeq K(R-\frac{tn^T}{d} )k^{-1}p_1$
 - 单应矩阵$H = K(R-\frac{tn^T}{d} )k^{-1} = \begin{bmatrix}
 h_1  &h_2  &h_3 \\
@@ -188,6 +199,51 @@ $
 - $s_2x_2=s_1Rx_1+t$
 - 通过同时乘$x_2^\wedge$可以得到: $0 = s_2x_2^\wedge x_2=s_1x_2^\wedge Rx_1+ x_2^\wedge t$，可以依次计算获得s_1$和$s_2$。
 
+## 回环检测
+### 检测
+#### BOW
+#### 场景识别
+### 矫正
+#### Sim3矫正，完后posegraph
+
+
+# 多视图几何
+## 2D
+### 等距变换
+- $X_2 = H_EX = \begin{bmatrix}
+R&t\\
+0^T&1
+\end{bmatrix}X_1 $
+- 3自由度，旋转R1、平移t2
+- 线段长度不变、夹角不变、面积不变
+### 相似变换
+- $X_2 = H_SX = \begin{bmatrix}
+sR&t\\
+0^T&1
+\end{bmatrix}X_1 $
+- 4自由度，尺度s1、旋转R1、平移t2
+- 夹角不变，长度比值不变，面积的比值不变
+### 仿射变换
+- $X_2 = AX = \begin{bmatrix}
+A&t\\
+0^T&1
+\end{bmatrix}X_1 $
+- 6自由度，矩阵A是非奇异矩阵4、平移t2
+- 夹角不变，长度比值不变，面积的比值不变
+- 平行线保持平行，平行线段长度以及面积比值不变
+### 映射变换
+- $X_2 = H_pX = \begin{bmatrix}
+A&t\\
+a^T&v
+\end{bmatrix}X_1 $
+- 8自由度，矩阵A是非奇异矩阵4、平移t2、a矩阵2,v是个比例系数H_p可以同时除以v固定
+- 共线不变，交比(比值的比值)不变
+- > 个人感觉这个玩意的计算和单应矩阵H的形式差不多都是8自由度
+>
+### 3D 
+- 对应的增加自由度
+
+
 # 状态估计
 - SLAM求解的是当前$k$时刻状态$x_k$，可以看做一个状态估计问题。
 ## 状态估计问题定义
@@ -219,25 +275,44 @@ $$
 - 是下降算法。容易出现锯齿现象，增加迭代的次数
 ### 牛顿法
 - 二阶泰勒展开的数值最小，一般是对$\Delta x$求导导数为0的极值点。
-- $J+H\Delta = 0$
+- $J+H\Delta x = 0$
 - 是下降算法。需要计算H矩阵，计算量大
 ### 高斯牛顿法
 - 思路使用$f(x)$的雅可比矩阵$J(x)J^T(x)$近似$H$矩阵。$f(x +\Delta x)  = f(x) + J(x)^T \Delta x$。带入计算后使得导数为0可得到：
 - $J(x)J^T(x) \Delta x = - J(x)f(x) \Rightarrow H(x)\Delta x = g(x)$
-- 避免了计算$H$导致的计算量过大的问题|使用$J(x)J^T(x)$近似的$H(x)$半正定肯出现奇异病态；近似的$H(x)$只在$x$附近效果不错，可能出现求解得到的$\Delta x$的步长过大，局部的近似不准确的问题。
+- 避免了计算$H$导致的计算量过大的问题,使用$J(x)J^T(x)$近似的$H(x)$半正定肯出现奇异病态；近似的$H(x)$只在$x$附近效果不错，可能出现求解得到的$\Delta x$的步长过大，局部的近似不准确的问题。
 ### LM优化算法
-- 考虑到高斯牛顿法近似不准确，给定一个近似的信赖区间半径$\mu$，并根据$\rho = \frac{f(x + \Delta x)-f(x)}{J^T(x)\Delta x}$指标判断$\mu$的好坏，$\rho$大于一定值可以增加$\mu$半径，反之亦然。
-- $(H(x) + \lambda D^TD) \Delta x= g(x)$，相比于高斯牛顿法多了$\lambda D^TD$，可以将$ D^TD$近似为单位矩阵 $I$进行简化|$\lambda$比较小时，近似于高斯牛顿法；。$\lambda$比较大的时候，$\lambda I$占主要地位，近似于最速度下降法。
+- 考虑到高斯牛顿法近似不准确，给定一个近似的信赖区间半径$\mu$，$||D \Delta x||^2 \le μ$，$D$为系数矩阵。根据$\rho = \frac{f(x + \Delta x)-f(x)}{J^T(x)\Delta x}$指标判断$\mu$的好坏，$\rho$约接近1近似效果好。$\rho$大于一定值可以增加$\mu$半径，反之亦然。
+- 通过拉格朗日乘子法将收敛区间融合到目标函数中。求解无约束问题$\mathcal{L}(\Delta x , \lambda) = \frac{1}{2}\left \| f(x) +J^T\Delta x \right \|^2  +\frac{\lambda}{2}(\left \| D\Delta x \right \|^2-\mu )$，化简得到：$(H(x) + \lambda D^TD) \Delta x= g(x)$
+- 相比于高斯牛顿法多了$\lambda D^TD$，可以将$ D^TD$近似为单位矩阵 $I$进行简化,$\lambda$比较小时，近似于高斯牛顿法；。$\lambda$比较大的时候，$\lambda I$占主要地位，近似于最速度下降法。
 
 ## 优化库
 ### g2o
+#### 优化器
+#### 求解器
+#### 顶点 优化变量
+#### 边 误差
+##### 信息矩阵
+##### 鲁棒核函数
 ### ceres
 
 # 滤波
 
+# 异常值剔除策略
+## RANSAC算法
+- 基本假设：内点数符合模型，外点不符合。内点数大于外点数目。
+- 步骤：1.随机选N个点(至少N个点可以计算出模型参数)，计算此次N个点拟合模型。2.计算当前模型的内点数目。3.统计内点数最大的模型参数。4.重复1-3步骤直至模型参数足够好(内点数目足够)或者到大最大迭代次数。
+
 
 # 李群李代数
-- 一种指数映射。SO3和SE3使用$\exp()$的指数映射展开，并且根据$a^ \wedge a^ \wedge a^ \wedge = -a^ \wedge$、$\sin()$、$\cos()$级数合并化简得到的。
+- >为什么这么搞用李代数呢？为了求解位姿方便，一般是6自由度位姿，矩阵R是3自由度，但是是3行3列共9个参数，完后自身有一些性质本身还得加上一些约束$RR^T=I,det(R) = 1$。这样子不方便求解，使用李代数位姿6自由度6个参数，没有超参数，也不要加上自身的一些约束。
+## 定义
+- 李群：特殊正交群$SO3 = \left \{R \in \mathbb{R}^{3\times 3}|RR^T = I,det(R) = 1 \right \}$，特殊欧式群$SE3 = \left \{T = \begin{bmatrix}
+  R&t \\
+  0^T&1
+\end{bmatrix} \in \mathbb{R}^{4\times 4}|R \in SO(3),T \in\mathbb{R}^{3} \right \}$
+- 李代数：一种指数映射。SO3和SE3使用$\exp()$的指数映射展开，并且根据$a^ \wedge a^ \wedge a^ \wedge = -a^ \wedge$、$\sin()$、$\cos()$级数合并化简得到的。
+
 ## SO3
 - $R = \exp (\phi ^ \wedge) =  exp (\theta a ^ \wedge)  =  I + \sin \theta a^ \wedge +(1-\cos \theta)a^ \wedge a^ \wedge $
 其中$\phi$表示旋转的三个维度，$\theta$是向量$\phi$的模，$a$是向量$\phi$的单位向量。
@@ -250,6 +325,25 @@ R &
 \end{bmatrix}$
 其中，$\phi$表示旋转的三个维度，$\rho$表示平移的三个维度。
 ## 求导数
+### 公式 
+- $\begin{matrix}
+ \frac{\partial\exp(\phi^\wedge)p}{\partial\phi} &=\lim_{\delta\phi\to0}\frac{\exp(\phi^\wedge+\delta\phi^\wedge)-\exp(\phi^\wedge)}{\delta\phi}\\
+左雅可比&=\lim_{\delta\phi\to0}\frac{\exp((J_l\delta\phi)^\wedge)\exp(\phi^\wedge)-\exp(\phi^\wedge)}{\delta\phi}\\
+右雅可比&=\lim_{\delta\phi\to0}\frac{\exp(\phi^\wedge)\exp((J_r\delta\phi)^\wedge)-\exp(\phi^\wedge)}{\delta\phi}
+\end{matrix}$
+### BCH近似
+- $\begin{aligned}
+\exp(\triangle\xi^\wedge)\exp(\xi^\wedge)\approx \exp((J_l^{-1}\triangle\xi + \xi)^\wedge)\\
+\exp(\xi^\wedge)\exp(\triangle\xi^\wedge)\approx \exp((J_r^{-1}\triangle\xi + \xi)^\wedge)
+\end{aligned}$
+
+
+### 特点
+- 直接对李群李代数求导数的形式会导致需要计算$J_l$或者$J_r$计算量较大所以一般使用扰动模型代替直接求导数的形式。
+
+## 扰动模型求导数
+- 左扰动:$\frac{\partial Rp}{\partial\varphi } = \lim_{\varphi \to 0} \frac{\exp(\varphi ^\wedge) \exp(\phi  ^\wedge) - \exp(\phi  ^\wedge)}{\varphi} $
+- 右扰动$\frac{\partial Rp}{\partial\varphi } = \lim_{\varphi \to 0} \frac{\exp(\phi  ^\wedge) \exp(\varphi ^\wedge)- \exp(\phi  ^\wedge)}{\varphi}$
 - 左扰动右扰动都可以，只是要注意在更新SO3和SE3时，需要保持更新扰动与求导的一致性。
 ### 左扰动
 - 正常求导数:$\frac{\partial Tp}{\partial \delta \xi }  = \begin{bmatrix}
@@ -273,7 +367,8 @@ R &
 \end{bmatrix}$
 - 右扰动求解完变化量$dx =\begin{bmatrix} d\phi &d\rho
 \end{bmatrix}$，更新$T =T*\exp(d\xi  ^\wedge)$
-
+### 与直接求导数的区别
+- 相加的微小变化量方式不一致，主要就是减少了计算量。
 
 # 矩阵
 ## 求解齐次线性方程组的解

@@ -34,7 +34,7 @@ public:
 
         for (int i = startIndex; i < candidates.size(); i++)
         {
-            if (i > startIndex && candidates[i] == candidates[i - 1])
+            if (i > startIndex && candidates[i] == candidates[i - 1])//去重操作，重复的数字只在第一次使用时进行相同数字的叠加
                 continue;
 
             path.push_back(candidates[i]);

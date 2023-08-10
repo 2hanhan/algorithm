@@ -26,7 +26,7 @@ public:
         if (path.size() >= 2)
             result.push_back(path);
 
-        set<int> have;
+        set<int> have;//无排序的去重操作，以have为第一个的排序已经处理过了
         for (int i = startIndex; i < nums.size(); i++)
         {
             if (have.count(nums[i]) || (!path.empty() && nums[i] < path[path.size() - 1]))

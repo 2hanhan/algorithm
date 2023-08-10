@@ -9,8 +9,7 @@
  * @copyright Copyright (c) 2023
  *
  */
-#include <vector>
-#include <algorithm>
+#include <bits/stdc++.h>
 using namespace std;
 
 class Solution
@@ -47,6 +46,45 @@ public:
         sort(nums.begin(), nums.end());
         vector<bool> used(nums.size(), false);
         backTracking(nums, used);
+        return result;
+    }
+};
+
+
+class Solution {
+public:
+    vector<vector<int>> result;
+    vector<int> path;
+
+    void backTracking(vector<int>& nums,vector<bool> used)
+    {
+        if(path.size() == nums.size())
+        {
+            result.push_back(path);
+            return;
+        }
+
+        set<int> have;
+        for(int i = 0; i < nums.size();i++)
+        {
+            if(used[i]||have.count(nums[i]))
+                continue;
+
+            have.insert(nums[i]);
+            path.push_back(nums[i]);
+            used[i] = true;
+
+            backTracking(nums,used);
+
+            path.pop_back();
+            used[i] = false;
+            
+        }
+    }
+    vector<vector<int>> permuteUnique(vector<int>& nums) 
+    {
+        vector<bool> used(nums.size(),false);
+        backTracking(nums,used);
         return result;
     }
 };
