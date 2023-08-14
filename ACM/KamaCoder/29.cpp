@@ -113,8 +113,8 @@ int main()
         map.push_back(x);
     }
 
-    vector<vector<int>> supermarket(n, vector<int>(n, 0));//每个区块可以开超市的编号
-    unordered_map<int, pair<bool, int>> supermarket_distance;//区块超市编号，区块是否有房子(没房子就不用开超市)，该区块各个房子到超市的距离
+    vector<vector<int>> supermarket(n, vector<int>(n, 0));    // 每个区块可以开超市的编号
+    unordered_map<int, pair<bool, int>> supermarket_distance; // 区块超市编号，区块是否有房子(没房子就不用开超市)，该区块各个房子到超市的距离
     for (int i = 0; i < n; i++)
     {
         for (int j = 0; j < n; j++)
