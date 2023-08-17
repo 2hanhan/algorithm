@@ -320,14 +320,14 @@ $$
 - 步骤：1.随机选N个点(至少N个点可以计算出模型参数)，计算此次N个点拟合模型。2.计算当前模型的内点数目。3.统计内点数最大的模型参数。4.重复1-3步骤直至模型参数足够好(内点数目足够)或者到大最大迭代次数。
 
 # 坐标变换与Eigen3实现
-### 欧式变换
-## 旋转
-### 四元数
-### 欧拉角
-### 旋转矩阵
-## 平移
+## 欧式变换
+### 旋转
+#### 四元数
+#### 欧拉角
+#### 旋转矩阵
+### 平移
 
-## 坐标差值
+## 坐标插值
 ```c++
 Eigen::Quaterniond q0，q1;
 Eigen::Quaterniond deltaq = q0.inverse()*q1;
@@ -384,7 +384,7 @@ R &
  0^T&0^T
 \end{bmatrix}$
 - 对逆求导数:$\frac{\partial T^{-1}p}{\partial \delta \xi }  = \begin{bmatrix}
- -R& Rp^\wedge \\
+ -R^T& R^T(p)^\wedge \\
  0^T&0^T
 \end{bmatrix}$
 - 左扰动求解完变化量$dx =\begin{bmatrix} d\phi &d\rho
@@ -395,7 +395,7 @@ R &
  0^T&0^T
 \end{bmatrix}$
 - 对逆求导数:$\frac{\partial T^{-1}p}{\partial \delta \xi }  = \begin{bmatrix}
- -I& R(Rp+t)^\wedge \\
+ -I& (R^Tp+R^Tt)^\wedge \\
  0^T&0^T
 \end{bmatrix}$
 - 右扰动求解完变化量$dx =\begin{bmatrix} d\phi &d\rho
