@@ -319,12 +319,20 @@ $$
 - 基本假设：内点数符合模型，外点不符合。内点数大于外点数目。
 - 步骤：1.随机选N个点(至少N个点可以计算出模型参数)，计算此次N个点拟合模型。2.计算当前模型的内点数目。3.统计内点数最大的模型参数。4.重复1-3步骤直至模型参数足够好(内点数目足够)或者到大最大迭代次数。
 
-# 坐标变换
+# 坐标变换与Eigen3实现
+### 欧式变换
 ## 旋转
+### 四元数
+### 欧拉角
+### 旋转矩阵
 ## 平移
+
 ## 坐标差值
 ```c++
-deltaq = q1*q0.inverse();
+Eigen::Quaterniond q0，q1;
+Eigen::Quaterniond deltaq = q0.inverse()*q1;
+double t0,t1;
+double ratio = (t-t0)/(t1-t0);
 Eigen::Quaterniond q = q0.slerp(ratio,deltaq);
 ```
 
