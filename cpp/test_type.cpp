@@ -39,11 +39,13 @@ int main(int argc, char **argv)
     // fill(arr3[0], arr3[0] + sizeof(arr3)/sizeof(int), 990);
     // cout << arr3[1][1] << endl;
 
-    float x = -0.02;
-    float size = 0.2;
-    int64_t index = x/size;
-    cout<<index<<endl;
+    // {
+    //     float x = -0.02;
+    //     float size = 0.2;
+    //     int64_t index = x / size;
+    //     cout << index << endl;
+    //     cout << endl;
+    // }
 
-    cout << endl;
     return 0;
 }

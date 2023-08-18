@@ -8,17 +8,9 @@
  * @copyright Copyright (c) 2023
  *
  */
-#include <iostream>
-#include <typeinfo>
+#include <bits/stdc++.h>
+#include <memory>
 
-#include <list>
-#include <queue>
-#include <string>
-#include <unordered_map>
-#include <unordered_set>
-
-#include <algorithm>
-#include <functional>
 using namespace std;
 
 template <class T>
@@ -95,15 +87,30 @@ void test_list()
                  << "iter == myList.end()";
         num--;
     }
-    //迭代器++超过end()后会从begin()重新开始
+    // 迭代器++超过end()后会从begin()重新开始
 
     myList.insert(iter, 10);
     printall(myList);
 }
 
+void test_memset_nums()
+{
+    int m = 6, n = 5;
+    int distance[m][n];
+    memset(distance, -1, m * n * sizeof(int));
+
+    for (int i = 0; i < m; i++)
+    {
+        for (int j = 0; j < n; j++)
+        {
+            cout << "[" << i << "," << j << ":" << distance[i][j] << "]";
+        }
+    }
+}
+
 int main(int argc, char **argv)
 {
-    test_list();
+    test_memset_nums();
     cout << endl;
     return 0;
 }
