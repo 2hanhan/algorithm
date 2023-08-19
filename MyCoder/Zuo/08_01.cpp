@@ -30,45 +30,100 @@ class Solution
 public:
     pair<int, int> func(string s, int i)
     {
+        // cout << "func:" << i << endl;
         int result = 0;
         int cur = 0;
         queue<char> Q;
+        queue<int> nums;
 
         while (i < s.size() && s[i] != ')') // 遇到数字
         {
             if (s[i] >= '0' && s[i] <= '9')
             {
-                cur = cur * 10 + s[i] - '0';
+                cur = cur * 10 + s[i++] - '0';
             }
-            else if (s[i] != ')') // 遇到运算符合
+            else if (s[i] != ')' && s[i] != '(') // 遇到运算符
             {
-                addNum(Q, cur);
+                // cout << s[i] << " " << cur << endl;
+                nums.push(cur);
                 Q.push(s[i++]);
                 cur = 0;
             }
-            else
+            else 
             {
                 pair<int, int> temp = func(s, i + 1);
                 cur = temp.first;
                 i = temp.second + 1;
             }
         }
-        addNum(Q, cur);
-        return {getNum(que), i};
+
+        nums.push(cur);
+        return {getNum(nums, Q), i};
     }
-    int result = 0;
-    void addNum(queue<char> Q, int cur)
+    int getNum(queue<int> nums, queue<char> Q)
     {
-    }
-    int getNum(queue<char> Q)
-    {
+        // cout << "getNum" << endl;
+
+        int left, right;
+
+        stack<int> help;
+        right = nums.front();
+        nums.pop();
+        help.push(right);
+
+        while (!nums.empty())
+        {
+            if (Q.front() == '*')
+            {
+                int left = help.top();
+                help.pop();
+                int right = nums.front();
+                nums.pop();
+
+                help.push(left * right);
+            }
+            else if (Q.front() == '/')
+            {
+                left = help.top();
+                help.pop();
+
+                right = nums.front();
+                nums.pop();
+
+                help.push(left / right);
+            }
+            else if (Q.front() == '-')
+            {
+                right = nums.front();
+                nums.pop();
+
+                help.push(-right);
+            }
+            else
+            {
+                right = nums.front();
+                nums.pop();
+
+                help.push(right);
+            }
+            Q.pop();
+        }
+
+        int result = 0;
+        while (!help.empty())
+        {
+            result += help.top();
+            help.pop();
+        }
+
+        return result;
     }
 };
 
 int main()
 {
     Solution solution;
-    string s;
-    solution.func(s, 0);
+    string s = "1+2*6*(8+9*0-2)+10*(152/10)";
+    cout <<s<<"="<< solution.func(s, 0).first;
     return 0;
 }
