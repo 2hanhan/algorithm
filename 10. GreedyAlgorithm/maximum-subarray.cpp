@@ -22,8 +22,8 @@ public:
         int sum = result;
         for (int i = 1; i < nums.size(); i++)
         {
-            if (sum < 0)
-                sum = 0;
+            if (sum < 0)//如果先前的求和sum为负数，那么加元素nums[i]一定会不如只取nums[i]值大
+                sum = 0;//所以sum归零，从nums[i]开始重新求和
 
             sum += nums[i];
             if (sum > result)

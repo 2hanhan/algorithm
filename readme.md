@@ -7,7 +7,7 @@
 ### 视频类型
 1. [《代码随想录》](https://space.bilibili.com/525438321/channel/collectiondetail?sid=180037)
 
-2. [LeetCode左程云](https://www.bilibili.com/video/BV1UB4y1S7dF/?p=1)
+2. [LeetCode左程云视频](https://www.bilibili.com/video/BV1UB4y1S7dF/?p=1)
    - [算法课help info](https://shimo.im/docs/68cd6h3TwygPwx8W/read)
    - [算法学习代码](https://github.com/algorithmzuo/algorithmbasic2020/tree/master)
    - [刷题JAVA代码实现](https://github.com/algorithmzuo/coding-for-great-offer/tree/main/src)

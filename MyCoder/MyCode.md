@@ -1,3 +1,22 @@
+# 模板
+```c++
+#include <bits/stdc++.h> 
+using namespace std;
+
+class Solution
+{
+    public:
+};
+
+int main()
+{
+    Solution solution;
+
+
+    return 0;
+}
+```
+
 # LeetCode中C++一些Bug
 1. 定义有返回值的函数，if情况及时穷举了所有情况并且return，只要没写else就会给你报错没有返回值。
 比如即使调用时候x只给了1，2，3的数值
