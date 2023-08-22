@@ -56,10 +56,36 @@ v=f_yy_{distorted}+c_y
 - 相似三角形关系:$\frac{z-f}{z} = \frac{b-u_L+u_R}{b} $,其中$b$是双目相机的基线，两个水平放置的相机光圈在x轴上的距离。
 - 深度值$z = \frac{fb}{d}$，视差$d\overset{def}{=}u_L-u_R$，$b$是基线
 ##### 深度图像RGB-D
-### IMU
-#### IMU参数
-#### 积分方法
-##### 预积分
+
+### IMU(参考VINS)
+#### 测量值(输入)
+##### 加速度计 acc
+- 测量值:$\hat{a_t} = a_t +b_{a_t}+R_w^tg^w+n_a$
+- 零偏:$b_{a_t}$，$\hat{b}_{a_t} \sim N(0,\sigma_{b_\omega}^2)$
+- 白噪声:$n_a\sim N(0,\sigma_a^2)$
+##### 陀螺仪 gyr
+- 测量值:$\hat{\omega _t} = \omega _t +b_{\omega _t}+ n_\omega$
+- 零偏:$b_{\omega_t}$，$\hat{b}_{\omega_t} \sim N(0,\sigma_{b_\omega}^2)$
+- 白噪声:$n_\omega\sim N(0,\sigma_\omega^2)$
+
+#### 预测量 PVQB (输出)
+- 假设$[t_k,t_{k+1}]$这段时间所有的测量值保持不变都是t时刻的值，根据t时刻选取的位置不同，有不同的预积分形式。
+##### 位置 Position
+- $p_{b_{k+1}}^w=p_{b_{k}}^w + v_{b_k^w}\Delta t + \iint_{t\in[t_k,t_{k+1}]}(R_t^w(\hat{a}_t-b_{a_t} - n_a)-g^w)dt^2 $
+##### 速度 Velocity
+- $v_{b_{k+1}}^w=v_{b_{k}}^w + \int_{t\in[t_k,t_{k+1}]}(R_t^w(\hat{a}_t-b_{a_t} - n_a)-g^w)dt$
+##### 四元数 Quaternion
+- $q_{b_{k+1}}^w=q_{b_{k}}^w \otimes \int_{t\in[t_k,t_{k+1}]}\frac{1}{2}\Omega q_t^{b_k}dt$，其中$\Omega = \begin{bmatrix}
+  -\left \lfloor \omega \right \rfloor_\times  &\omega \\
+ -\omega^T &0
+\end{bmatrix},\left \lfloor \omega \right \rfloor_\times=\begin{bmatrix}
+  0&-\omega_z  &\omega_y \\
+  \omega_z&  0&-\omega_x \\
+ -\omega_y &  \omega_x&0
+\end{bmatrix}$，其中$q_t^{b_k}$是t时刻basic系下的旋转四元数
+##### 偏移量 Bias
+#### 增量式计算PVQB0
+- 后续优化中需要对估计量$v$和$R^w_t$进行更新，需要迭代更新PVQ计算结果，这导致需要重新计算积分结果。而计算积分的过程比较耗时。预积分的目的是将后续参与优化更新的量从积分计算中分离出来，以减少计算量。
 ##### 中值积分
 ### 外参标定
 
@@ -289,7 +315,20 @@ $$
 - 通过拉格朗日乘子法将收敛区间融合到目标函数中。求解无约束问题$\mathcal{L}(\Delta x , \lambda) = \frac{1}{2}\left \| f(x) +J^T\Delta x \right \|^2  +\frac{\lambda}{2}(\left \| D\Delta x \right \|^2-\mu )$，化简得到：$(H(x) + \lambda D^TD) \Delta x= g(x)$
 - 相比于高斯牛顿法多了$\lambda D^TD$，可以将$ D^TD$近似为单位矩阵 $I$进行简化,$\lambda$比较小时，近似于高斯牛顿法；。$\lambda$比较大的时候，$\lambda I$占主要地位，近似于最速度下降法。
 
-## 稀疏性 和 边缘化 Marginalizatio (Schur消元)
+## 滑窗优化(参考VINS)
+### 滑窗中的边缘化生成先验
+- 滑窗优化中需要维持固定的帧数的关键帧，当滑窗中的帧数已经达到最大，又有新的关键帧需要添加时。需要先对要剔除的关键帧进行边缘化，使得剔除的关键帧留下先验约束部分，其他关键帧保留不变。
+- 边缘化会有fillin操作，这会导致矩阵H不在具有稀疏性。
+### 滑窗中的合并新旧信息
+- 边缘化留下的先验残差，先验残差的雅可比矩阵后续无法更新，则其线性化点固定在边缘化之前的状态量处。
+- 新的残差约束到的状态量，新的残差的状态量雅可比矩阵的线性化点会在优化过程中根据状态量位置不断变化。
+- 当先验残差与信增残差约束相同的状态量，合并时，导致同一个状态量的先验残差的雅可比的线性化点与新增的残差的雅可比不一致。对同一个状态量在不同的位置进行线性化，会引入人为的错误观测约束，这可能会导致系统崩溃。
+- 通过FEJ算法解决这个问题。
+#### FEJ算法 First Estimated Jacobian
+- VINS中没有使用FEJ算法
+- emmmm之后再看[这个吧](https://zhuanlan.zhihu.com/p/304889273)
+
+## 优化求解中的 稀疏性 和 边缘化 Marginalizatio (Schur消元)
 ### 稀疏性
 - 定义：通常来说求解$H \Delta x = g$时候，$H = \sum J_{i,j}TJ_{i,j}$，如果按照先相机，后观测点的顺序，不同的两个观测点对应位置的矩阵块是为0的，这个就是一般所说H矩阵的稀疏性。
 - 利用稀疏性可以加速矩阵计算，这个假设加速计算过程称为边缘化(Marginalization)或者Schur消元。
@@ -300,7 +339,7 @@ $$
 \begin{bmatrix}v -EC^{-1}w \\w\end{bmatrix}$
 - 求解：1.求解第一行$\begin{bmatrix}B - EC^{-1}E^T&0 \end{bmatrix} \begin{bmatrix}\Delta x_c\end{bmatrix} =
 \begin{bmatrix}v -EC^{-1}w \end{bmatrix}$得到相机状态$\Delta x_c$。2.将$\Delta x_c$带入，通过第二行求解$\Delta x_p = C^{-1}\left (w -E^T \Delta x_c \right ) $
-- 边缘化 Marginalizatio：是因为上说求解过程，可以看做是先固定$\Delta x_p$求解$\Delta x_c$，从概率上看是求解$P(x_c,x_p) = P(x_c|x_p)P(x_p)$，就是把$x_p$边缘化。
+- 边缘化 Marginalizatio：是因为上说求解过程，可以看做是先固定$\Delta x_p$求解$\Delta x_c$，从概率上看是求解$P(x_c,x_p) = P(x_c|x_p)P(x_p)$，就是把$x_p$边缘化，将$\Delta  x_p$看做已知的先验提供约束来求解$\Delta x_c$。
 
 ## 优化库
 ### g2o
@@ -328,12 +367,13 @@ $$
 ### 平移
 
 ## 坐标插值
+### 四元数球面差值
+- $slerp(q_0,q_1,t) = \frac{sin[(1-t) \theta]\cdot q_0+sin(t\theta)\cdot q_1}{sin \theta}$,其中$t = \frac{t - t_0}{t_1-t_0}$,$\theta = q_0\cdot q_1$。
 ```c++
 Eigen::Quaterniond q0，q1;
-Eigen::Quaterniond deltaq = q0.inverse()*q1;
 double t0,t1;
 double ratio = (t-t0)/(t1-t0);
-Eigen::Quaterniond q = q0.slerp(ratio,deltaq);
+Eigen::Quaterniond q = q0.slerp(ratio,q1);
 ```
 
 

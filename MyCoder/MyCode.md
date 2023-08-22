@@ -1,4 +1,5 @@
 # 模板
+linux 下统计内存耗时
 ```c++
 #include <bits/stdc++.h> 
 using namespace std;
@@ -6,15 +7,36 @@ using namespace std;
 class Solution
 {
     public:
+    int getresult(vector<int> &nums)
+    {
+        return 0;
+    }
 };
 
 int main()
 {
-    Solution solution;
+    // 开始计时
+    auto start = std::chrono::high_resolution_clock::now();
 
+    // 代码
+    Solution solution;
+    vector<int> nums;
+    cout << "result:" << solution.getresult(nums) << endl;
+
+    // 结束计时
+    auto end = std::chrono::high_resolution_clock::now();
+
+    // 计算耗时
+    std::chrono::duration<double> duration = end - start;
+    double seconds = 1000 * duration.count();
+
+    // 输出结果
+    std::cout << endl;
+    std::cout << "Elapsed time: " << std::fixed << std::setprecision(2) << seconds << " ms\n";
 
     return 0;
 }
+
 ```
 
 # LeetCode中C++一些Bug

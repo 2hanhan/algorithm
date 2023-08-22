@@ -123,7 +123,7 @@ public:
 int main()
 {
     Solution solution;
-    string s = "1+2*6*(8+9*0-2)+10*(152/10)";
+    string s = "1+2*6*(8+9*0-2)+10*(20/10)";
     cout <<s<<"="<< solution.func(s, 0).first;
     return 0;
 }

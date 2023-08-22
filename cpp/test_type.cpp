@@ -9,9 +9,38 @@
  *
  */
 
-#include <iostream>
+#include <bits/stdc++.h>
 using namespace std;
-#include <cstring>
+
+struct XY
+{
+    int x;
+    int y;
+};
+
+void test_size()
+{
+    XY xy_s;
+    cout << "struct :" << sizeof(xy_s) << endl;
+
+    int xy[2];
+    cout << "xy[2]:" << 2 * sizeof(int) << endl;
+
+    vector<int> xy_v={1,2};
+    xy_v.reserve(10000000);
+    // xy_v.resize(10000000);
+
+    cout << "xy_v:" <<  sizeof(xy_v) << endl;
+
+
+    char a[] = "123456789";
+    char b[128];
+    char *c = a;
+    cout << "a:" <<  sizeof(a) << endl;
+    cout << "b:" <<  sizeof(b) << endl;
+    cout << "c:" <<  sizeof(c) << endl;
+
+}
 
 int main(int argc, char **argv)
 {
@@ -46,6 +75,8 @@ int main(int argc, char **argv)
     //     cout << index << endl;
     //     cout << endl;
     // }
+
+    test_size();
 
     return 0;
 }
