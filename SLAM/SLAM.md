@@ -91,7 +91,7 @@ v=f_yy_{distorted}+c_y
 ##### 速度 Velocity
 - $R^{b_k}_wv_{b_{k+1}}^w=R^{b_k}_w(v^w_{b_k} - g^w\Delta t_k) + \beta^{b_k}_{b_k+1}$，其中$\beta^{b_k}_{b_k+1} = \int_{t\in[t_k,t_{k+1}]}[R^{b_k}_t(\hat{a}_t-b_{a_t}-n_a)]dt$仅仅和测量量有关系。
 ##### 四元数 Quaternion
-- $q^{b_k}_wq_{b_{k+1}}^w= \gamma^{b_k}_{b_k+1}$，其中$\gamma^{b_k}_{b_k+1}= \int_{t\in[t_k,t_{k+1}]}\frac{1}{2}\Omega\gamma^{b_k}_tdt$仅仅和测量量有关系。
+- $q^{b_k}_wq_{b_{k+1}}^w= \gamma^{b_k}_{b_k+1}$，其中$\gamma^{b_k}_{b_k+1}= \int_{t\in[t_k,t_{k+1}]}\frac{1}{2}\Omega\gamma^{b_k}_tdt$仅仅和测量量有关系，这里是四元数表示也可以使用李代数表示。
 ##### 误差模型的分析
 - 假设误差bias的更新是这样的：$b_{a_t} = b_{a_t} + \delta _t n_{b_a}$，$b_{\omega_t} = b_{\omega_t} + \delta _t n_{b_\omega}$
 ###### 误差的导数
