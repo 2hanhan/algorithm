@@ -68,7 +68,7 @@ v=f_yy_{distorted}+c_y
 - 零偏:$b_{\omega_t}$，$\hat{b}_{\omega_t} \sim N(0,\sigma_{b_\omega}^2)$
 - 白噪声:$n_\omega\sim N(0,\sigma_\omega^2)$
 
-#### 预测量 PVQB (输出)
+#### 预测量 PVQ (输出，世界坐标系下) 
 - 假设$[t_k,t_{k+1}]$这段时间所有的测量值保持不变都是t时刻的值，根据t时刻选取的位置不同，有不同的预积分形式。
 ##### 位置 Position
 - $p_{b_{k+1}}^w=p_{b_{k}}^w + v_{b_k^w}\Delta t + \iint_{t\in[t_k,t_{k+1}]}(R_t^w(\hat{a}_t-b_{a_t} - n_a)-g^w)dt^2 $
@@ -82,11 +82,33 @@ v=f_yy_{distorted}+c_y
   0&-\omega_z  &\omega_y \\
   \omega_z&  0&-\omega_x \\
  -\omega_y &  \omega_x&0
-\end{bmatrix}$，其中$q_t^{b_k}$是t时刻basic系下的旋转四元数
-##### 偏移量 Bias
-#### 增量式计算PVQB0
-- 后续优化中需要对估计量$v$和$R^w_t$进行更新，需要迭代更新PVQ计算结果，这导致需要重新计算积分结果。而计算积分的过程比较耗时。预积分的目的是将后续参与优化更新的量从积分计算中分离出来，以减少计算量。
-##### 中值积分
+\end{bmatrix},\omega = \hat{\omega}_t-b_{\omega _t }- n_{\omega}$，其中$q_t^{b_k}$是t时刻basic系下的旋转四元数。积分的那一部分含义是四元数形式表示的角度变化量。
+
+#### 增量式计算PVQB (输出，$t_k$时刻baisc坐标系下) 
+- 后续优化中需要对估计量$v$和$R^w_t$进行更新，需要迭代更新PVQ计算结果，这导致需要重新计算积分结果。而计算积分的过程比较耗时。预积分的目的是将后续参与优化更新的量从积分计算中分离出来，以减少计算量。**其实就是转换到了$t_k$时的basic坐标系。**
+##### 位置 Position
+- $R^{b_k}_wp_{b_{k+1}}^w=R^{b_k}_w(p^{b_k}_w + v^w_{b_k}\Delta t_k-\frac{1}{2}g^w\Delta t_k^2) + \alpha^{b_k}_{b_k+1}$，其中$\alpha^{b_k}_{b_k+1} = \iint_{t\in[t_k,t_{k+1}]}[R^{b_k}_t(\hat{a}_t-b_{a_t}-n_a)]dt^2$仅仅和测量量有关系。
+##### 速度 Velocity
+- $R^{b_k}_wv_{b_{k+1}}^w=R^{b_k}_w(v^w_{b_k} - g^w\Delta t_k) + \beta^{b_k}_{b_k+1}$，其中$\beta^{b_k}_{b_k+1} = \int_{t\in[t_k,t_{k+1}]}[R^{b_k}_t(\hat{a}_t-b_{a_t}-n_a)]dt$仅仅和测量量有关系。
+##### 四元数 Quaternion
+- $q^{b_k}_wq_{b_{k+1}}^w= \gamma^{b_k}_{b_k+1}$，其中$\gamma^{b_k}_{b_k+1}= \int_{t\in[t_k,t_{k+1}]}\frac{1}{2}\Omega\gamma^{b_k}_tdt$仅仅和测量量有关系。
+##### 误差模型的分析
+- 假设误差bias的更新是这样的：$b_{a_t} = b_{a_t} + \delta _t n_{b_a}$，$b_{\omega_t} = b_{\omega_t} + \delta _t n_{b_\omega}$
+###### 误差的导数
+- $\delta\dot{z}^{b_k}_t = F_t\delta z^{b_k}_t + G_t n_t$
+- 其中$z=[\alpha^k_t,\beta^k_t,\theta^k_t,b_{a^k_t},b_{\omega^k_t}]$
+- 误差的导数 $\delta\dot{z} = \dot{z}_{true} - \dot{z}_{nominal}$其中true是真实值，nominal是理论值不考虑误差。
+- 具体计算就是把每一个考虑的变量都加一个相关的噪声或者扰动，这里是R加上一个李代数的扰动$R = R\exp(\delta \theta)$，其他的加上噪声$a = a + n_a,\omega = \omega + n_\omega,b_a = b_a + \delta t b_a,,b_\omega = b_\omega + \delta t b_\omega$,这部分用来计算上面公式的true部分,使用$\delta\dot{z} = \dot{z}_{true} - \dot{z}_{nominal}$进行计算。
+
+###### 误差的更新
+- $\delta z^{b_k}_{t+\delta t} = z^{b_k}_t + \delta\dot{z}^{b_k}_t \delta t = F \delta z^{b_k}_t + V n_t$
+
+#### 中值积分
+- 积分中的加速度$a_t$和角速度$\omega _t$的取值是前后两个时刻测量值的中值，$\Delta t = t_{k+1}-t_k$。
+- 加速度：$a_t = \frac{a_{t_k}+a_{t_{k+1}}}{2}$
+- 加速度:$\omega_t = \frac{\omega_{t_k}+\omega_{t_{k+1}}}{2}$
+
+
 ### 外参标定
 
 ## 前端里程计 Visual Odometry
