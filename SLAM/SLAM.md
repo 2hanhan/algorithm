@@ -151,7 +151,7 @@ v=f_yy_{distorted}+c_y
 - 2D-2D、2D-3D、3D-3D都有个前提: **已知匹配关系**
 #### 2D-2D 对极几何
 ##### 本质矩阵E和基础矩阵F
-- 约束关系:$x_2^TEx_1 = p_2^TFp_1$
+- 约束关系:$x_2^TEx_1 = p_2^TFp_1=0$
 - 本质矩阵:$E = t^\wedge R$，性质:E的特征值必定为$[\sigma,\sigma,0]^T$的样式
 - 基础矩阵:$F = K^{-T}EK$
 - $x_1=K^{-1}p_1、x_2=K^{-1}p_2$
@@ -231,7 +231,7 @@ t_9 &t_{10}&t_{11}  &t_{12}
 $\min_{\xi }\frac{1}{2}  \sum_{i=1}^{n}\left \|p_i- \exp(\xi ^\wedge p_i^,) \right \| _2^2
 $
 ### 直接法
-- 不进行特征特提取和匹配，直接通过广度误差计算相机位姿
+- 不进行特征特提取和匹配，直接通过光度误差计算相机位姿
 
 ### 提取关键帧
 
@@ -239,6 +239,7 @@ $
 
 ## 后端优化
 ### 滑窗优化 Slide Window
+- 剔除旧的约束边缘化成先验信息、融合新的约束FEJ处理保证线性化点的一致性
 ### 局部优化 Loacl Bundle Adjustment
 ### 全局优化 Global Bundle Adjustment
 #### 位姿图优化
@@ -255,7 +256,7 @@ $
 #### BOW
 #### 场景识别
 ### 矫正
-#### Sim3矫正，完后posegraph
+#### Sim3矫正，完后位姿图优化posegraph
 
 
 # 多视图几何
@@ -304,8 +305,8 @@ a^T&v
 - 求解$x,y$的最优解:$x = arg\max_{x} p(x,y|z,u)$
 - 通过贝叶斯公式可以表示为$似然*先验$的形式:$p(x,y|z,u) = \frac{p(z,u|x,y)p(x,y)}{p(z,u)}\propto  p(z,u|x,y)p(x,y)$
 - 由于先验$p(x,y)$无法计算，就只考虑似然$p(z,u|x,y)$，所以MAP问题变成了极大似然估计
-### 极大似然Maximize Likelihood Estimation MLE
-- 转换后的:$x,y = arg \max_{x,y}p(z,u|x,y) = arg \max_{x,y} \prod_{k}p(u_k|x_k-1,x_k)\prod_{k,j} p(z_{k,j}|x_k,y_j)$
+### 极大似然估计 Maximize Likelihood Estimation MLE
+- 转换后的:$x,y = arg \max_{x,y}p(z,u|x,y) = arg \max_{x,y} \prod_{k}p(u_k|x_{k-1},x_k)\prod_{k,j} p(z_{k,j}|x_k,y_j)$
 - 误差模型:$e_{u,k}=x_k-f(x_{k-1},u_k),e_{z,k,j} = z_{k,j} - h(x_k,y_j)$
 - 通过取对数可以转换为:$x,y=min_{x,y}\sum_ke^T_{u,k}R_k^{-1}e_{u,k} + \sum_k\sum_je^T_{z,k,j}Q_{k,j}^{-1}e_{z,k,j}$，等价为误差模型的最小二乘问题。
 
@@ -331,7 +332,7 @@ $$
 ### 高斯牛顿法
 - 思路使用$f(x)$的雅可比矩阵$J(x)J^T(x)$近似$H$矩阵。$f(x +\Delta x)  = f(x) + J(x)^T \Delta x$。带入计算后使得导数为0可得到：
 - $J(x)J^T(x) \Delta x = - J(x)f(x) \Rightarrow H(x)\Delta x = g(x)$
-- 避免了计算$H$导致的计算量过大的问题,使用$J(x)J^T(x)$近似的$H(x)$半正定肯出现奇异病态；近似的$H(x)$只在$x$附近效果不错，可能出现求解得到的$\Delta x$的步长过大，局部的近似不准确的问题。
+- 避免了计算$H$导致的计算量过大的问题,使用$J(x)J^T(x)$近似的$H(x)$半正定可能出现奇异病态；近似的$H(x)$只在$x$附近效果不错，可能出现求解得到的$\Delta x$的步长过大，局部的近似不准确的问题。
 ### LM优化算法
 - 考虑到高斯牛顿法近似不准确，给定一个近似的信赖区间半径$\mu$，$||D \Delta x||^2 \le μ$，$D$为系数矩阵。根据$\rho = \frac{f(x + \Delta x)-f(x)}{J^T(x)\Delta x}$指标判断$\mu$的好坏，$\rho$约接近1近似效果好。$\rho$大于一定值可以增加$\mu$半径，反之亦然。
 - 通过拉格朗日乘子法将收敛区间融合到目标函数中。求解无约束问题$\mathcal{L}(\Delta x , \lambda) = \frac{1}{2}\left \| f(x) +J^T\Delta x \right \|^2  +\frac{\lambda}{2}(\left \| D\Delta x \right \|^2-\mu )$，化简得到：$(H(x) + \lambda D^TD) \Delta x= g(x)$
@@ -475,7 +476,11 @@ R &
 ### 最小二乘解
 - $X = (A^TA)^{-1}A^Tb$
 ## 矩阵相关
+### 奇异矩阵
+- 矩阵是n*n的方阵，并不是满秩
+- 矩阵的行列式$|A|=0$
 ### 反对称矩阵
+- 主对角线元素均为0，而位于主对角线两侧对称的元素反号。
 - $a^\wedge  = A =\begin{bmatrix}
 0    &-a_3  &a_2 \\
 a_3  &0    &-a_1 \\
@@ -483,5 +488,21 @@ a_3  &0    &-a_1 \\
 \end{bmatrix} $
 其中$a = [a_1,a_2,a_3]^T$
 - 如果$a$是单位向量则有:$a^ \wedge a^ \wedge a^ \wedge = -a^ \wedge$
+### 正定矩阵
+- 对任意非0向量$x$满足$x^TAx > 0$
+### 半正定矩阵
+- 对任意非0向量$x$满足$x^TAx >= 0$
+- 协方差矩阵是半正定矩阵
 
+
+# 概率
+## 贝叶斯公式
+- $P(x|y)=\frac{P(y|x)P(x)}{P(y)}$
+## 极大似然估计 Maximize Likelihood Estimation MLE
+- 模型确定，参数未知
+- 求解$\theta$使得$P(x_0|\theta)$最大
+## 最大后验估计 Maximum A Posteriori MAP
+- 模型确定，参数未知
+- 求解$\theta$使得$P(\theta|x_0)=\frac{P(x_0|\theta)P(\theta)}{P(x_0)}$最大
+- P(x_0)是可以根据观测获得的固定值，所有转换为求解$P(x_0|\theta)P(\theta)$最大
 # 一些数学运算符号和基础
