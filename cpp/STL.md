@@ -5,7 +5,7 @@
 顺序容器|
 list|$O(n)$|$O(1)$|$O(1)$|$O(1)$，但是确定迭代器的位置需要$O(n)$|$O(1)$|$O(1)$|$O(1)$`iter = l.easse(iter)`|不支持
 vector|$O(1)$|$O(1)$|不支持|$O(n)$|$O(1)$|不支持|$O(n)$ `iter = v.erase(iter)`|不支持
-deque|$O(1)$|$O(1)$|$O(1)$|$O(n)$|$O(1)$|$O(1)$|$O(n)$|不支持
+deque|$O(1)$|$O(1)$|$O(1)$|$O(n)$|$O(1)$|$O(1)$|$O(n)$`iter = d.easse(iter)`|不支持
 关联容器红黑树实现|
 map、multimap、set、multiset|$O(log(n))$|不支持|不支持|$O(log(n))$|不支持|不支持|$O(log(n))$`m.erase(iter++)`|$O(log(n))$
 关联容器 hashtable实现|

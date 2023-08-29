@@ -72,14 +72,16 @@ public:
         // BaseShow_private(); // error
     }
 };
-int main()
+
+// 测试public、protect、private继承
+void test01()
 {
     Derived_public d_public;
     d_public.DerivedShow();
     d_public.BaseShow_public();
 
     Base b;
-    // b.BaseShow_protected(); //error
+    // b.BaseShow_protected(); //! 报错
 
     cout << endl;
     cout << endl;
@@ -93,6 +95,88 @@ int main()
 
     Derived_private d_private;
     d_private.DerivedShow();
+}
 
+class A
+{
+public:
+    A()
+    {
+        cout << "A()构造函数" << endl;
+    }
+
+    ~A()
+    {
+        cout << "~A()析构函数" << endl;
+    }
+};
+
+class B
+{
+public:
+    B()
+    {
+        cout << "B()构造函数" << endl;
+    }
+
+    ~B()
+    {
+        cout << "~B()析构函数" << endl;
+    }
+};
+
+class C
+{
+public:
+    C()
+    {
+        cout << "C()构造函数" << endl;
+    }
+
+    ~C()
+    {
+        cout << "~C()析构函数" << endl;
+    }
+};
+
+class D
+{
+public:
+    D()
+    {
+        cout << "D()构造函数" << endl;
+    }
+
+    ~D()
+    {
+        cout << "~D()析构函数" << endl;
+    }
+};
+
+class E : public A, public B
+{
+public:
+    E()
+    {
+        cout << "E()构造函数" << endl;
+    }
+
+    ~E()
+    {
+        cout << "~E()析构函数" << endl;
+    }
+    C c;
+    D d;
+};
+
+// 测试构造和析构顺序
+void test02()
+{
+    E e;
+}
+
+int main()
+{
+    test02();
     return 0;
 }
