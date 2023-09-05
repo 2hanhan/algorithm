@@ -57,7 +57,7 @@ int main()
     {
 
         // H*dx = J*J^T
-        // g = -J error
+        // g = -J*error
         error = 0;
         Eigen::Matrix3d H = Eigen::Matrix3d::Zero();
         Eigen::Vector3d g = Eigen::Vector3d::Zero();

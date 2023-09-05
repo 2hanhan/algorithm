@@ -20,8 +20,8 @@ int main()
 
     // 代码
     Solution solution;
-    vector<int> nums;
-    cout << "result:" << solution.getresult(nums) << endl;
+    auto result = solution.getresult(s);
+    cout << "result:" << result << endl;
 
     // 结束计时
     auto end = std::chrono::high_resolution_clock::now();

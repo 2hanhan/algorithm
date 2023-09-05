@@ -14,6 +14,8 @@
    - [一些题目](https://mubu.com/doc/IodJW7cCNk?accessToken=eyJhbGciOiJIUzI1NiIsImtpZCI6ImRlZmF1bHQiLCJ0eXAiOiJKV1QifQ.eyJleHAiOjE2OTIwMDE0OTIsImZpbGVHVUlEIjoiNjhjZDZoM1R3eWdQd3g4VyIsImlhdCI6MTY5MjAwMTE5MiwiaXNzIjoidXBsb2FkZXJfYWNjZXNzX3Jlc291cmNlIiwidXNlcklkIjotODE4NzgxMTcxOX0.gq7mcmSo3nR20Ybr2WILm4e4MJMl-9Y-enV-pQP_aPk)
 > 这里面的对于暴力递归总结的很彻底。
 
+3. [左程云bilibili主页](https://space.bilibili.com/8888480/video)
+   - [对应代码链接](https://github.com/algorithmzuo/algorithm-journey/tree/main)
 # VSCode
 Windows11、mingw64编译器:中文路径无法运行改成英文文件夹
 
