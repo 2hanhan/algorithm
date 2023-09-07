@@ -108,9 +108,57 @@ void test_memset_nums()
     }
 }
 
+void test_erase()
+{
+    unordered_map<int, int> um1;
+    unordered_map<int, int> um2;
+
+    map<int, int> m1;
+    map<int, int> m2;
+
+    for (int i = 0; i < 5; i++)
+    {
+        um1.insert({i, 10 * i + 1});
+        um2.insert({i, 10 * i + 1});
+
+        m1.insert({i, 10 * i + 2});
+        m2.insert({i, 10 * i + 2});
+    }
+
+    cout << "1: iter = um.erase(iter) 2: um.erase(iter++)  " << endl;
+    auto um1_iter = um1.begin();
+    cout << um1_iter->second << endl;
+    um1_iter = um1.erase(um1_iter);
+    cout << um1_iter->second << endl;
+    um1.erase(um1_iter++);
+    cout << um1_iter->second << endl;
+    cout << "1: um.erase(iter++) 2: iter = um.erase(iter) " << endl;
+    auto um2_iter = um2.begin();
+    cout << um2_iter->second << endl;
+    um2_iter = um2.erase(um2_iter);
+    cout << um2_iter->second << endl;
+    um2.erase(um2_iter++);
+    cout << um2_iter->second << endl;
+
+    cout << "1: iter = m.erase(iter) 2: m.erase(iter++)  " << endl;
+    auto m1_iter = m1.begin();
+    cout << m1_iter->second << endl;
+    m1_iter = m1.erase(m1_iter);
+    cout << m1_iter->second << endl;
+    m1.erase(m1_iter++);
+    cout << m1_iter->second << endl;
+    cout << "1: m.erase(iter++) 2: iter = m.erase(iter) " << endl;
+    auto m2_iter = m2.begin();
+    cout << m2_iter->second << endl;
+    m2.erase(m2_iter++);
+    cout << m2_iter->second << endl;
+    m2_iter = m2.erase(m2_iter);
+    cout << m2_iter->second << endl;
+}
+
 int main(int argc, char **argv)
 {
-    test_memset_nums();
+    test_erase();
     cout << endl;
     return 0;
 }
