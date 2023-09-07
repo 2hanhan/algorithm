@@ -435,6 +435,11 @@ Eigen::Quaterniond q = q0.slerp(ratio,q1);
 - Hesse形式：$\pi^{'} = T^\top \pi,\ \pi=(n^\top,d)$。该方法为过参数化表示；
 - 球坐标形式：$(\phi,\theta,d)$，该过程为非**过参数化**表示，仅在优化中表示；
 
+# 不确定建模
+- 采样点$p_i \sim N(\mu,\sigma)$，即$P_i$的不确定性$\Sigma_{p_i}$
+- 测量参数$x = f(p_1,p_2,...,p_i,...p_N)$
+- 则$x$的不确定性$\Sigma_x = \sum_{i=0}^N\frac{\delta f}{\delta p_i}\Sigma_{p_i}\frac{\delta f}{\delta p_i}^T$
+
 
 
 # 李群李代数
