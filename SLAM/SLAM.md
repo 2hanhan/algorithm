@@ -400,7 +400,26 @@ $$
 - $b(2|x|-b),x>b$
 ### ceres
 
-# 滤波
+# 滤波 TODO
+## 卡尔曼滤波器
+### 已知
+- 先验、状态转移矩阵（包含状态转移误差$\omega_k $）$x_k = Ax_{k-1} + Bu_k + \omega_k $
+- 观测方程（包含观测误差$ v_k$的协方差$R$）$z_k = Hx_k + v_k$
+- 上一个状态量的先验$x_{k-1}$
+- 当前时刻的后验$x_k^* = x_k + k_k(z_k-Hx_k)$
+### 求解
+- 当前状态时刻的后验$x_k^*$，使得$error = x_{k_{true}} - x_k^*$最小
+- 等价与使得error的协方差最小
+- 结果是当卡尔曼增益$k_k = \frac{P_kH^T}{HP_kH^T+R}$时误差最小
+- 先验协方差$P_k = AP_{k-1}^*A^T+Q$是先验状态估计和真实值的误差$error = x_{k_{true}}-x_k = Ae_{k-1}+\omega_{k-1}$的协方差。
+### 预测
+- 先验状态$x_k = Ax_{k-1}+Bu_{k-1}$
+- 先验协方差$P_k=AP_{k-1}A^T+Q$
+### 更新
+- 卡尔曼增益$k_k = \frac{P_kH^T}{HP_kH^T+R}$
+- 后验状态$x_k^* = x_k + k_k(z_k-Hx_k)$
+- 后验协方差$P_k^* = (I-k_kH)P_k$
+
 
 # 异常值剔除策略
 ## RANSAC算法
@@ -417,7 +436,7 @@ $$
 #### 旋转矩阵
 ### 平移
 
-## 坐标插值
+## 坐标插值[参考资料](https://zhuanlan.zhihu.com/p/87418561) TODO
 ### 四元数球面差值
 - $slerp(q_0,q_1,t) = \frac{sin[(1-t) \theta]\cdot q_0+sin(t\theta)\cdot q_1}{sin \theta}$,其中$t = \frac{t - t_0}{t_1-t_0}$,$\theta = q_0\cdot q_1$。
 ```c++
