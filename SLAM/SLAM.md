@@ -181,7 +181,7 @@ h_7  &h_8  &h_9
 ###### 求解H的非齐次线性方程组
 - $H$共有8个参数，线性方程组求解需要8个方程，每对匹配的像素点提供2个方程，可以通过4对匹配点计算。
 - 直接线性变化 DLT DLT Direct Linear Transform求解
-- 计算出$H$后分解可以计算获得$R、t$
+- 计算出$H$后分解可以计算获得$R、t$,具体分解[参考](https://zhuanlan.zhihu.com/p/448706080)
 
 #### 2D-3D PnP Perspective-n-Point[详情参考](https://zhuanlan.zhihu.com/p/399140251)
 ##### 直接线性变换DLT Direct Linear Transform
@@ -283,6 +283,9 @@ $
 #### NICP
 ### NDT算法 
 
+# SLAM退化问题
+- H矩阵$HH^T$的某个特征值小于一定阈值，在该特征值对应的特征向量方向上发生退化。
+- 解决策略：将求解的状态向量$x_u$投影到非退化方向上，然后通过其他约束（IMU或者横向约束）求解状态$x_p$投影到退化方向，合并相加两个状态向量得到最终的状态估计。
 
 # 多视图几何
 ## 2D
@@ -401,9 +404,9 @@ $$
 ### ceres
 
 # 滤波 TODO
-## 卡尔曼滤波器
+## 卡尔曼滤波器 KF
 ### 已知
-- 先验、状态转移矩阵（包含状态转移误差$\omega_k $）$x_k = Ax_{k-1} + Bu_k + \omega_k $
+- 先验、状态转移矩阵（包含状态转移误差$\omega_k $的协方差$Q$）$x_k = Ax_{k-1} + Bu_k + \omega_k $
 - 观测方程（包含观测误差$ v_k$的协方差$R$）$z_k = Hx_k + v_k$
 - 上一个状态量的先验$x_{k-1}$
 - 当前时刻的后验$x_k^* = x_k + k_k(z_k-Hx_k)$
@@ -419,6 +422,10 @@ $$
 - 卡尔曼增益$k_k = \frac{P_kH^T}{HP_kH^T+R}$
 - 后验状态$x_k^* = x_k + k_k(z_k-Hx_k)$
 - 后验协方差$P_k^* = (I-k_kH)P_k$
+## 扩展卡尔曼滤布 EKF
+### 特点
+- EKF通过在均值附近对非线性方程一阶泰勒展开，通过获取非线性函数在均值的斜率来构造近似线性函数。
+- 误差状态总是在原点0附近，远离了奇异值、万向节锁等问题，从而确保卡尔曼滤波时候的合理性和有效性。
 
 
 # 异常值剔除策略
@@ -436,15 +443,33 @@ $$
 #### 旋转矩阵
 ### 平移
 
-## 坐标插值[参考资料](https://zhuanlan.zhihu.com/p/87418561) TODO
-### 四元数球面差值
-- $slerp(q_0,q_1,t) = \frac{sin[(1-t) \theta]\cdot q_0+sin(t\theta)\cdot q_1}{sin \theta}$,其中$t = \frac{t - t_0}{t_1-t_0}$,$\theta = q_0\cdot q_1$。
+## 坐标插值
+- 求解$t$时刻的坐标，比值$t = \frac{t - t_0}{t_1-t_0}$
+### 四元数差值[参考](https://zhuanlan.zhihu.com/p/87418561) 
+#### 线性差值 Lerp
+- $Lerp(q_0,q_1,t)=(1-t)q_0+tq_1$
+- 问题：Lerp差值获得的四元数不一定是单位四元数，而旋转需要使用单位四元数表示。
+#### 正规化线性差值 NLerp
+- $NLerp(q_0,q_1,t)=\frac{(1-t)q_0+tq_1}{||(1-t)q_0+tq_1||}$
+- $NLerp(\omega_0,\omega_1,t)=\frac{(1-t)\omega_0+t\omega_1}{||(1-t)\omega_0+t\omega_1||}$
+- 问题：NLerp在需要差值的范围较大时，角速度$\omega_t$会有显著变化。
+#### 球面线性差值 Slerp
+- $slerp(q_0,q_1,t) = \frac{sin[(1-t) \theta]\cdot q_0+sin(t\theta)\cdot q_1}{sin \theta}$
+- $slerp(\omega_0,\omega_1,t) = \frac{sin[(1-t) \theta]\cdot \omega_0+sin(t\theta)\cdot \omega_1}{sin \theta}$
+- 通过对角度进行插值$\theta_t=t\theta$,其中$\cos\theta = q_0\cdot q_1$，解决角速度问题。
+- 但是当$\theta$很小时$\sin\theta\to0$，建议使用NLerp。
 ```c++
 Eigen::Quaterniond q0，q1;
 double t0,t1;
 double ratio = (t-t0)/(t1-t0);
 Eigen::Quaterniond q = q0.slerp(ratio,q1);
 ```
+### 李群差值 [参考](https://zhuanlan.zhihu.com/p/88780398)
+- $R_t = R_1\exp(tln(R_1^{-1}R_2))$和 $T_t=T_1\exp(tln(T_1^{-1}T_2))$
+- 其中$t \in[0,1]$，$t=0$时是$R_t = R_1，T_t = T_1$,$t=1$时是$R_t = R_2，T_t = T_2$，$t$的范围也可以做一定的推广。
+### 欧拉角差值
+- 不使用欧拉角分别插值：姿态空间插值的一个主要问题是姿态空间的三个自由度是相互耦合的，而不像位置空间一样三个自由度完全解耦正交。所以，直接对欧拉角三个角度分别插值，可能存在奇异性或者错误结果，且插补后的刚体角速度不恒定。
+
 ## 直线的坐标变换 [参考](https://blog.csdn.net/ns2942826077/article/details/107092864?spm=1001.2014.3001.5501)
 - 普吕克矩阵表示：$L_c =T_{cw}L_wT_{cw}^\top,\ L=X_1X_2^\top - X_2X_1^\top$，为4x4的齐次反对称阵，其秩为2。普吕克坐标系可以用于初始化直线、表示直线、直线变换等，但是由于是**过参数化**表示，不能用来后端优化；
 - 普吕克直线表示：该种表示方法是一种**过参数**表示，用6个参数表示4自由度的直线，是Plucker矩阵中六个非零元素的排列。我个人直观上理解，就是线的方向及线的垂直方向。
@@ -498,7 +523,7 @@ R &
 ### 特点
 - 直接对李群李代数求导数的形式会导致需要计算$J_l$或者$J_r$计算量较大所以一般使用扰动模型代替直接求导数的形式。
 
-## 扰动模型求导数
+## 扰动模型求导数[参考](https://www.zhihu.com/question/454486535)
 - 左扰动:$\frac{\partial Rp}{\partial\varphi } = \lim_{\varphi \to 0} \frac{\exp(\varphi ^\wedge) \exp(\phi  ^\wedge) - \exp(\phi  ^\wedge)}{\varphi} $
 - 右扰动$\frac{\partial Rp}{\partial\varphi } = \lim_{\varphi \to 0} \frac{\exp(\phi  ^\wedge) \exp(\varphi ^\wedge)- \exp(\phi  ^\wedge)}{\varphi}$
 - 左扰动右扰动都可以，只是要注意在更新SO3和SE3时，需要保持更新扰动与求导的一致性。
@@ -536,30 +561,48 @@ R &
 - 求解$AX = b$中的$X$
 ### 最小二乘解
 - $X = (A^TA)^{-1}A^Tb$
-## 矩阵分解
-### LU分解
-- $A = LU$
-- L 下三角、左
-- U 上三角、右
-### QR分解
-- $A = QR$
-- Q 正交矩阵
-- R 上三角
-### 奇异值分解SVD分解
-- $A = UDV^T$
-- U 正交矩阵
-- D 对角矩阵
-- V 正交矩阵
-### LDLT分解
-- $A = LDL^T$
-- L 下三角、左
-- D 对角矩阵
 
+
+## 矩阵分解
+可以在一定程度上降低存储空间，可以大大减少问题处理的计算量（如对一个矩阵求逆、求解方程组等。求矩阵逆的过程也就是求方程组的过程），从而高效地解决目标问题。可以提高算法的数值稳定性。
+
+
+### LU分解
+- $A = LU$， L 下三角、左， U 上三角、右。
+- 应用
+  1. 简化一个大矩阵的行列式值的计算过程。
+  2. 求解方程组。原方程图转换为$LUx=b$，令$Ux=y$，则$Ly=b$，利用高斯消元解出$y$，然后再利用高斯消元根据$Ux=y$解出$x$。
+### QR分解
+- $A = QR$， Q 正交矩阵， R 上三角。
+- 分解方法：
+  1. Givens 变换
+  2. Householder 变换
+  3. Gram-Schmidt正交化。
+- 应用：
+  1. 用于稳定求解病态最小二乘问题的方法。
+### 奇异值分解SVD分解
+- $A = UDV^T$，U 正交矩阵，D 对角矩阵，V 正交矩阵。$U^TU = I$
+- 特点：在大多数实际情况中，奇异值$\sigma$减小的速度特别快，因此可以使用前r个奇异值来对矩阵做近似（即丢弃U和V的后几列）获得原始矩阵A在最小二乘意义下的最佳逼近。
+- 应用
+  1. 求解齐次线性方程组$Ax=0$,最终结果x为最小特征值对应的特征向量。
+  2. 求解非齐次线性方差$Ax=b$，$min||Ax - b|| = min||UDV^Tx-b|| = min||U^TUDV^Tx - U^Tb|| = min||Dy - \hat{b}||$，其中$y= V^Tb,\hat{b} = U^Tb$
+  3. 求特征值，特征向量，平面拟合。
+  4. 直接线性变换DLT求解的本质矩阵E，分解求R、t。如果不符合$E=t^R$的内在性质可以通过SVD分解求得的特征值和特征向量对E进行调整。[参考](https://zhuanlan.zhihu.com/p/434787470)
+  
+### LDLT分解
+- $A = LDL^T$，A 对称矩阵，且任意一K阶主子阵均不为0时，L 下三角、左， D 对角矩阵
+- $A = LDL^T =\begin{bmatrix}1 & 0 & 0\\ L_{21} & 1 & 0 \\ L_{31} & L_{32} & 1\end{bmatrix}
+\begin{bmatrix}D_1 & 0 & 0\\ 0 & D_2 & 0 \\ 0 & 0 & D_3\end{bmatrix}\begin{bmatrix}1 & L_{21} & L_{31} \\ 0 & 1 & L_{32}\\ 0 & 0 & 1\end{bmatrix}$
+- LDLT方法实际上是Cholesky分解法的改进（LLT分解需要开平方），用于求解线性方程组。
+- 应用：
+  1. 求解LM算法$H\Delta x = g$，因为$H = J^TJ$是对称矩阵。
 
 ### LLT分解 Cholesky分解
-- $A = LL^T = R^TR$
-- L 下三角、左
-- R 上三角、右
+- $A = LL^T = R^TR$，A是正定矩阵，L 下三角、左， R 上三角、右。
+- 应用：
+  1. 求解$Ax=b$暨$LL^Tx=b$。首先$Ly=b$高斯消元法求解出$y$,然后$L^Tx=y$高斯消元法求解出$x$。
+  2. 求解最小二乘问题$A^TAx=A^Tb$  令$H = A^TA = R^TR$， $B = A^Tb$，则有$H\mathbf x = B$因子经过因子分解后，$\mathbf x$可以通过下面的方程获得。只需要求解两个三角系统，通过一些列前向和后向迭代运算:$R^Tz = B , \quad R \mathbf x = z$
+
 
 
 ## 矩阵相关
@@ -582,6 +625,12 @@ a_3  &0    &-a_1 \\
 ### 半正定矩阵
 - 对任意非0向量$x$满足$x^TAx >= 0$
 - 协方差矩阵是半正定矩阵
+
+### 矩阵的行列式
+- $det(A) = |A|$
+
+## 矩阵的秩
+- $r(A)$ A的线性无关的纵列的极大数
 
 
 # 概率
