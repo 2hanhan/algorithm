@@ -33,31 +33,37 @@ unordered_map、unordered_multimap、unordered_set、unordered_multiset|$O(1)$|�
 
 
 ## 容器适配器
-### stack
-栈
+适配器是标准库中通用的概念，包括容器适配器、迭代器适配器和函数适配器。本质上，适配器是使一事物的行为类似于另一类事物的行为的一种机制。容器适配器让一种已存在的容器类型采用另一种不同的抽象类型的工作方式实现。
+### stack 栈
+后进先出。栈的底层实现vector，deque，list 都是可以的，STL标准库默认是以deque为缺省情况实现的。不提供迭代器(iterator)进行遍历。 
 ```c++
 int value = 0;
 stack<int> mySta;
-//顶部
-mySta.pop(value);
-int x = mySta.top();
+mySta.push(value);
+mystack.emplace(1);//c++11：也是放入新的元素。这个新元素是通过传递 args 作为其构造函数的参数来构造的，效率更高。
+int value = mySta.top();
 mySta.pop();
+bool isempty = mySta.empty();
+int size = mySta.size();
+mySta.swap(stack<int>());
 ```
 
-### queue
-队列
+### queue 队列
+先进先出。STL标准库默认是以deque为缺省情况实现的。同样不提供迭代器(iterator)进行遍历。 
 ```c++
 int value;
-//头部
 queue<int> myQue;
 myQue.push(value);
-int x = myQue.front();
+myQue.emplace(1);
+int value_top = myQue.front();
 myQue.pop();
-//尾部
-int x = myQue.back();
+int value_back = myQue.back();
+bool isempty = myQue.empty();
+int size = mySta.size();
+mySta.swap(queue<int>());
 ```
-### priority_queue
-优先级队列
+### priority_queue 优先级队列
+内部维持某种有序，然后确保优先级最高的元素总是位于头部。最高优先级元素总是第一个出列。大顶堆（堆头是最大元素），小顶堆（堆头是最小元素）一般使用  priority_queue 进行实现，且默认情况下是大顶堆（比较函数为less ） 。
 ```c++
 // 自定义比较器，从大到小排列，小根堆
 class MyComparison
@@ -72,12 +78,13 @@ public:
 int value = 0;
 priority_queue<int, vector<int, int>, MyComparison> myPri_que;
 //根
-int x = myPri_que.top();
+int value_top = myPri_que.top();
 myPri_que.pop();
-//插入自动排序
 myPri_que.push(value)//插入操作
 myPri_que.emplace(10);//也是插入操作，直接构造，节省了拷贝复制的时间
-
+bool isempty = myPri_que.empty();
+int size = myPri_que.size();
+mySta.swap(priority_queue<int, vector<int, int>, MyComparison>());
 
 // 也可以使用lambda表达式进行处理
 vector<int> nums;
