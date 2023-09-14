@@ -283,9 +283,10 @@ $
 #### NICP
 ### NDT算法 
 
-# SLAM退化问题
+# SLAM退化问题 [参考](https://zhuanlan.zhihu.com/p/258159552)、[代码](https://github.com/laboshinl/loam_velodyne/blob/25db5dd5b2c135e779a50a11af0a53434598df7e/src/lib/BasicLaserOdometry.cpp#L595)
 - H矩阵$HH^T$的某个特征值小于一定阈值，在该特征值对应的特征向量方向上发生退化。
 - 解决策略：将求解的状态向量$x_u$投影到非退化方向上，然后通过其他约束（IMU或者横向约束）求解状态$x_p$投影到退化方向，合并相加两个状态向量得到最终的状态估计。
+- $x = x + V^{-1}_{H矩阵的特征向量}V_{去掉退化行的特征向量}dx$
 
 # 多视图几何
 ## 2D
