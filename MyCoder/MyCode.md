@@ -20,7 +20,8 @@ int main()
 
     // 代码
     Solution solution;
-    auto result = solution.getresult(s);
+    vector<int> nums = {3, 2, 4, 1};
+    auto result = solution.getresult(nums);
     cout << "result:" << result << endl;
 
     // 结束计时

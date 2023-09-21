@@ -13,6 +13,7 @@
 #include <bits/stdc++.h>
 using namespace std;
 
+// 贪心
 class Solution
 {
 public:
