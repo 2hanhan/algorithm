@@ -1,4 +1,10 @@
-# 容器
+# 模板
+模板实例化需要知道具体函数的定义。
+
+- `std::funtion`
+- `std::bind`
+
+## 容器
 各个容器的时间复杂度
  操作|访问，一般是指下标`[n]`访问，关联容器应该是用key|`push_back()`|`push_front()`|`insert()`|`pop_back()`|`pop_front()`|`erase()`|`find()`
 -|-|-|-|-|-|-|-|-
@@ -13,8 +19,8 @@ unordered_map、unordered_multimap、unordered_set、unordered_multiset|$O(1)$|�
 最坏情况：出现哈希冲突时|$O(n)$|不支持|不支持|$O(n)$|不支持|不支持|$O(n))$|$O(n))$|$O(n))$
 > 哈希冲突的时间复杂度，不应该取决于hash的桶内用什么方式存储key value吗？
 
-# 迭代器
-### 迭代器失效
+## 迭代器
+#### 迭代器失效
 >本质原因后续的增加删除操作导致原本存放数据的内存发生变化（被删除或者被扩容拷贝到了其他地方），而先前定义的迭代器还指向原来的位置造成的。
 1. `vector`和`string`这种在内存中连续位置存储的容器。`vector`和`string`内存中只有一块连续区域，扩容时在内存中另外找一份更大的连续区域（一般2倍or1.5倍扩容大概），然后将原本的数据拷贝到新的内存中并删除释放原有的数据。这会导致迭代器失效。
     - 增加元素导致扩容机制作用时，导致**所有的迭代器**失效。因为扩容机制导致搬运。
@@ -32,9 +38,9 @@ unordered_map、unordered_multimap、unordered_set、unordered_multiset|$O(1)$|�
     - 删除节点使用`a.erase(iter++) 或者 it = a.erase(iter)`，测试下来效果是一样的。
 
 
-## 容器适配器
+### 容器适配器
 适配器是标准库中通用的概念，包括容器适配器、迭代器适配器和函数适配器。本质上，适配器是使一事物的行为类似于另一类事物的行为的一种机制。容器适配器让一种已存在的容器类型采用另一种不同的抽象类型的工作方式实现。
-### stack 栈
+#### stack 栈
 后进先出。栈的底层实现vector，deque，list 都是可以的，STL标准库默认是以deque为缺省情况实现的。不提供迭代器(iterator)进行遍历。 
 ```c++
 int value = 0;
@@ -48,7 +54,7 @@ int size = mySta.size();
 mySta.swap(stack<int>());
 ```
 
-### queue 队列
+#### queue 队列
 先进先出。STL标准库默认是以deque为缺省情况实现的。同样不提供迭代器(iterator)进行遍历。 
 ```c++
 int value;
@@ -62,7 +68,7 @@ bool isempty = myQue.empty();
 int size = mySta.size();
 mySta.swap(queue<int>());
 ```
-### priority_queue 优先级队列
+#### priority_queue 优先级队列
 内部维持某种有序，然后确保优先级最高的元素总是位于头部。最高优先级元素总是第一个出列。大顶堆（堆头是最大元素），小顶堆（堆头是最小元素）一般使用  priority_queue 进行实现，且默认情况下是大顶堆（比较函数为less ） 。
 ```c++
 // 自定义比较器，从大到小排列，小根堆
@@ -99,8 +105,8 @@ priority_queue<int, vector<int>, decltype(cmp)> pq(cmp);
 ```
 
 
-## 顺序容器
-### list
+### 顺序容器
+#### list
 ```c++
 int size = 10
 int value = 0;
@@ -114,7 +120,7 @@ myList.insert(iter,value);//向iter位置插入元素，iter之后的元素后�
 
 ```
 
-### deque
+#### deque
 双向队列
 ```c++
 int value = 0;
@@ -129,7 +135,7 @@ int x = myDeq.back();
 myDeq.pop_back();
 
 ```
-### vector
+#### vector
 ```c++
 int value = 0;
 vector<int> myVec;
@@ -137,8 +143,8 @@ vector<int> myVec;
 myVec.push_back(value);
 ```
 
-## 关联容器
-### unordered_map
+### 关联容器
+#### unordered_map
 无序容器、哈希映射
 ```c++
 int num = 0;
@@ -161,7 +167,7 @@ iter = myMap.erase(iter,myMap.end());//更加迭代器范围删除，返回一�
 myMap.clear();
 ```
 
-### map
+#### map
 有序容器，红黑树
 ```c++
 int num = 0;
@@ -179,5 +185,49 @@ myMap.count(key);//查询key，如果找到返回1，找不到返回0
 ```
 
 
-# 迭代器
+
+## 算法
+### accumulate
+### equal
+使用`==`运算符比较实现
+### fill
+写入元素
+```c++
+fill(vec.begin(), vec.end(), 0);//将全部元素置0
+```
+### fill_n
+```c++
+fill_n(vec.begin(), 10, 0);//从vec.begin()开始填充10个元素0，要程序员保证不能序列长度从vec.begin()不能超过10个
+```
+#### back_inserter 
+返回插入迭代器
+```c++
+auto it = back_inserter(vec);
+fill_n(back_inserter(vec), 10, 0);
+```
+
+### copy
+```c++
+int a1[] = {0,1,2,3,4,5}
+int a2[sizeof(a1)/sizeof(*a1)];//a2与a1大小一致
+// 将a1拷贝到a2
+auto it = copy(begin(a1), end(a1), a2);//返回拷贝到a2的尾元素之后的位置
+```
+
+### replace
+### replace_copy
+### sort
+使用`<`运算符比较实现
+### unique
+```c++
+auto end_unique = unique(vec.begin(), vec.end());//并不删除只是覆盖相同元素，返回应该删除的位置
+```
+### stable_sort
+与sort相比使用归并排序实现能保证算法的稳定性
+### find_if
+获取满足条件的第一个迭代器
+### for_each
+
+
+# 迭代器test
 > 测试下来的迭代器超过end()会从begin()重新开始，至少list是这样
