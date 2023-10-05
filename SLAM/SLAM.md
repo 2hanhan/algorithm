@@ -63,11 +63,11 @@ v=f_yy_{distorted}+c_y
 ### IMU(参考VINS)
 #### 测量值(输入)
 ##### 加速度计 acc
-- 测量值:$\hat{a_t} = a_t +b_{a_t}+R_w^tg^w+n_a$
+- 测量值:$\hat{a_t} = a_t +b_{a_t}+R_w^tg^w+n_a$，basic坐标系下的加速度
 - 零偏:$b_{a_t}$，$\hat{b}_{a_t} \sim N(0,\sigma_{b_\omega}^2)$
 - 白噪声:$n_a\sim N(0,\sigma_a^2)$
 ##### 陀螺仪 gyr
-- 测量值:$\hat{\omega _t} = \omega _t +b_{\omega _t}+ n_\omega$
+- 测量值:$\hat{\omega _t} = \omega _t +b_{\omega _t}+ n_\omega$，basic坐标系下的角速度
 - 零偏:$b_{\omega_t}$，$\hat{b}_{\omega_t} \sim N(0,\sigma_{b_\omega}^2)$
 - 白噪声:$n_\omega\sim N(0,\sigma_\omega^2)$
 
@@ -269,7 +269,7 @@ $
 # LSLAM
 ## 数据关联匹配算法
 ### 最近邻匹配算法
-### KD-Tree
+### KD-Tree[参考](https://zhuanlan.zhihu.com/p/425207387)
 ### 八叉树 Octree 
 ## 匈牙利算法
 ## 高斯混合模型
@@ -277,10 +277,11 @@ $
 
 ## 点云注册 registration 已知3D-3D匹配关系求解位姿变换
 ### ICP[参考](https://blog.csdn.net/shoufei403/article/details/102972842)
-#### 点到点
-#### 点到面
+#### 点到点 一般形式
 #### GICP 
+#### PL-ICP
 #### NICP
+#### IMLS
 ### NDT算法 
 
 # SLAM退化问题 [参考](https://zhuanlan.zhihu.com/p/258159552)、[代码](https://github.com/laboshinl/loam_velodyne/blob/25db5dd5b2c135e779a50a11af0a53434598df7e/src/lib/BasicLaserOdometry.cpp#L595)
@@ -618,13 +619,14 @@ R &
 - 矩阵是n*n的方阵，并不是满秩
 - 矩阵的行列式$|A|=0$
 ### 反对称矩阵
-- 主对角线元素均为0，而位于主对角线两侧对称的元素反号。
+- 定义：$A^T=-A$
+- 向量对应的反对称矩阵：主对角线元素均为0，而位于主对角线两侧对称的元素反号。
 - $a^\wedge  = A =\begin{bmatrix}
 0    &-a_3  &a_2 \\
 a_3  &0    &-a_1 \\
 -a_2 &a_1  &0
 \end{bmatrix} $
-其中$a = [a_1,a_2,a_3]^T$
+其中$a = [a_1,a_2,a_3]^T$，还有$a^\wedge b = -b^\wedge a$
 - 如果$a$是单位向量则有:$a^ \wedge a^ \wedge a^ \wedge = -a^ \wedge$
 ### 正定矩阵
 - 对任意非0向量$x$满足$x^TAx > 0$
