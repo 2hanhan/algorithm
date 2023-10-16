@@ -51,7 +51,7 @@ public:
     }
 };
 
-// 动态规划
+// 动态规划 以结尾位置划分
 class Solution
 {
 public:

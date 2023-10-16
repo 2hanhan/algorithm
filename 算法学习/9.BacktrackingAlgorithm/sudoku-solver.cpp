@@ -16,7 +16,7 @@ using namespace std;
 class Solution
 {
 public:
-    bool isValid(vector<vector<char>> &board, int i, int j)
+    bool isValid(vector<vector<char>> &board, int i, int j) // 判断新增后是否合理
     {
         for (int k = 0; k < 9; k++)
         {
@@ -47,11 +47,14 @@ public:
 
         return true;
     }
+
+    
     bool backTracking(vector<vector<char>> &board, int i, int j)
     {
+        // base case
         int x = i * 9 + j + 1;
         if (x >= 82)
-            return true;
+            return true; // 如果填到了82个则填满了，结束
 
         if (board[i][j] == '.')
         {
@@ -60,7 +63,7 @@ public:
                 board[i][j] = k;
                 if (isValid(board, i, j))
                 {
-                    if (backTracking(board, x / 9, x % 9))
+                    if (backTracking(board, x / 9, x % 9)) // 填下一个
                         return true;
                 }
                 board[i][j] = '.';
@@ -69,7 +72,7 @@ public:
         }
         else
         {
-            return backTracking(board, x / 9, x % 9);
+            return backTracking(board, x / 9, x % 9); // 填下一个
         }
     }
     void solveSudoku(vector<vector<char>> &board)

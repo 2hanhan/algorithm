@@ -23,15 +23,14 @@ public:
 
         // 记录第x行的下一个
         int size = nums.size();
-        vector<int> next(size, 0);
+        vector<int> next(size, 0); // next[i]当前存的第i行的第next[i]个数
 
         auto cmp = [&](const int &a, const int &b)
         { return nums[a][next[a]] > nums[b][next[b]]; };
 
         cout << "cmp:" << typeid(cmp).name() << endl;
-        
 
-        priority_queue<int, vector<int>, decltype(cmp)> pq(cmp);
+        priority_queue<int, vector<int>, decltype(cmp)> pq(cmp); // 记录当前3个数中，最小的数是第几行的
 
         int min_value = 100000;
         int max_value = -100000;

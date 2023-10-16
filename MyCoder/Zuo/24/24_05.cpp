@@ -13,14 +13,14 @@
 #include <bits/stdc++.h>
 using namespace std;
 
-// 滑动窗口 欠债模型
+// 滑动窗口 贪心 欠债模型
 class Solution
 {
 public:
     string minWindow(string s, string t)
     {
         // step 1 统计 t 中各个字符数量
-        int count = 0;
+        int count = 0; // 还需要几个字符才能覆盖target
         vector<int> char_count(256, 0);
         for (; count < t.size(); count++)
         {
@@ -36,22 +36,22 @@ public:
 
             if (char_count[s[r]] > 0)
                 count--;
-            char_count[s[r]]--;
+            char_count[s[r]]--; // 需要该字符的数量 -1
 
             // 移动左边界
             while (count == 0)
             {
-                if (min_size > r - l)
+                if (min_size > r - l) // 更新最小的
                 {
                     best_l = l;
                     best_r = r;
-                    cout << " " << best_l << " " << best_r << endl;
+                    // cout << " " << best_l << " " << best_r << endl;
 
                     min_size = r - l;
                 }
 
-                char_count[s[l]]++;
-                if (char_count[s[l]] > 0)
+                char_count[s[l]]++;       // 需要该字符的数量 +1
+                if (char_count[s[l]] > 0) // 还需要该字符
                 {
                     count++;
                 }
