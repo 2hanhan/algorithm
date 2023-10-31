@@ -159,13 +159,13 @@ v=f_yy_{distorted}+c_y
 #### 2D-2D 对极几何
 ##### 本质矩阵E和基础矩阵F
 - 约束关系:$x_2^TEx_1 = p_2^TFp_1=0$
-- 本质矩阵:$E = t^\wedge R$，性质:E的特征值必定为$[\sigma,\sigma,0]^T$的样式
-- 基础矩阵:$F = K^{-T}EK$
+- 本质矩阵:$E = t^\wedge R$，性质:E的特征值必定为$[\sigma,\sigma,0]^T$的样式，自由度为5，因为尺度不确定性导致原本6自由度位姿平移尺度可变，自由度减一。
+- 基础矩阵:$F = K^{-T}EK$。自由度为7，在本质矩阵的基础上加上相机内参的2个自由度。
 - $x_1=K^{-1}p_1、x_2=K^{-1}p_2$
 其中$p_1、p_2$是像素坐标、$x_2、x_1$是两个像素点归一化平面坐标。
 ###### 求解E的齐次线性方程组
 - 八点法，$t^\wedge R$共9个参数，线性方程组求解需要8个方程，每对匹配点可以构建一个方程，所有至少需要8对点。
-- ?已知内参，并且考虑E自身的约束仅需要3对点,这个我没查到不一定对?
+- ?已知内参，并且考虑E自身的约束仅需要3对点，这是某个面试官说的，这个我没查到不一定对?
 - 可以使用SVD分解的E方式求解R和t，SVD分解会得到四组解，可以验证深度为正值进行筛选。
 - 为了使$E$满足性质可以对八点法的E进行SVD分解、获取特征值$[\sigma_1,\sigma_2,\sigma_3]^T$，其中$\sigma_1>=\sigma_2>=\sigma_3$,取$E^* = Udiag((\sigma_1+\sigma_2)/2,(\sigma_1+\sigma_2)/2,0)$
 
@@ -388,7 +388,7 @@ $$
 - 定义：通常来说求解$H \Delta x = g$时候，$H = \sum J_{i,j}TJ_{i,j}$，如果按照先相机，后观测点的顺序，不同的两个观测点对应位置的矩阵块是为0的，这个就是一般所说H矩阵的稀疏性。
 - 利用稀疏性可以加速矩阵计算，这个假设加速计算过程称为边缘化(Marginalization)或者Schur消元。
 ### 边缘化 Marginalizatio (Schur消元)
-- $H \Delta x = g$ 可以写成分块的形式- $\begin{bmatrix}B&E \\E^T&C\end{bmatrix} \begin{bmatrix}\Delta x_c\\\Delta x_p\end{bmatrix} =
+- $H \Delta x = g$ 可以写成分块的形式 $\begin{bmatrix}B&E \\E^T&C\end{bmatrix} \begin{bmatrix}\Delta x_c\\\Delta x_p\end{bmatrix} =
 \begin{bmatrix}v\\w\end{bmatrix}$
 - Schur消元：消除右上角的矩阵$E$，方程变为$\begin{bmatrix}B - EC^{-1}E^T&0 \\E^T&C\end{bmatrix} \begin{bmatrix}\Delta x_c\\\Delta x_p\end{bmatrix} =
 \begin{bmatrix}v -EC^{-1}w \\w\end{bmatrix}$
@@ -409,29 +409,51 @@ $$
 ### ceres
 
 # 滤波 TODO
+- >个人感觉滤波的方法，都是基于状态转移(运动方差)，和观测方程进行的推到，重点是先把这两个方程推到出来，然后带入预测和更新公式就好。
 ## 卡尔曼滤波器 KF
 ### 已知
-- 先验、状态转移矩阵（包含状态转移误差$\omega_k $的协方差$Q$）$x_k = Ax_{k-1} + Bu_k + \omega_k $
-- 观测方程（包含观测误差$ v_k$的协方差$R$）$z_k = Hx_k + v_k$
+- 先验、状态转移矩阵（包含状态转移误差$\omega_k $的协方差$R$）$x_k = Ax_{k-1} + u_k + \omega_k $
+- 观测方程（包含观测误差$ v_k$的协方差$Q$）$z_k = Cx_k + v_k$
 - 上一个状态量的先验$x_{k-1}$
-- 当前时刻的后验$x_k^* = x_k + k_k(z_k-Hx_k)$
-### 求解
+
+### 预测
+- 先验状态$x_k = Ax_{k-1}+u_k$
+- 先验协方差$P_k=AP_{k-1}A^T+R_k$
+### 更新
+- 卡尔曼增益$K_k = P_kC^T(CP_kC^T+R)^{-1}$
+- 后验状态$x_k^* = x_k + K_k(z_k-Cx_k)$
+- 后验协方差$P_k^* = (I-K_kC)P_k$
+
+### 求解与推到[参考讲解](https://www.bilibili.com/video/BV1ez4y1X7eR/?spm_id_from=333.999.0.0&vd_source=d2698384821931f16375af13c5b44a9f)
 - 当前状态时刻的后验$x_k^*$，使得$error = x_{k_{true}} - x_k^*$最小
 - 等价与使得error的协方差最小
-- 结果是当卡尔曼增益$k_k = \frac{P_kH^T}{HP_kH^T+R}$时误差最小
+- 结果是当卡尔曼增益$K_k = P_kC^T(CP_kC^T+R)^{-1}$时误差最小
 - 先验协方差$P_k = AP_{k-1}^*A^T+Q$是先验状态估计和真实值的误差$error = x_{k_{true}}-x_k = Ae_{k-1}+\omega_{k-1}$的协方差。
-### 预测
-- 先验状态$x_k = Ax_{k-1}+Bu_{k-1}$
-- 先验协方差$P_k=AP_{k-1}A^T+Q$
-### 更新
-- 卡尔曼增益$k_k = \frac{P_kH^T}{HP_kH^T+R}$
-- 后验状态$x_k^* = x_k + k_k(z_k-Hx_k)$
-- 后验协方差$P_k^* = (I-k_kH)P_k$
-## 扩展卡尔曼滤布 EKF
+## 扩展卡尔曼滤波 EKF
 ### 特点
-- EKF通过在均值附近对非线性方程一阶泰勒展开，通过获取非线性函数在均值的斜率来构造近似线性函数。
+- EKF通过在均值附近对非线性方程一阶泰勒展开，通过获取非线性函数在均值的斜率来构造近似线性函数。也就是$A,B,C$是不固定的。
 - 误差状态总是在原点0附近，远离了奇异值、万向节锁等问题，从而确保卡尔曼滤波时候的合理性和有效性。
 
+## 误差状态卡尔曼滤波 ESKF
+- 所有的状态均使用误差状态来表达
+### 已知
+- 先验、状态转移矩阵（包含状态转移误差$\omega$的协方差$R$）$\delta x = F\delta x + \omega $
+- 观测方程（包含观测误差$ v$的协方差$Q$）$z = Hx + v$
+- 上一个状态量的先验$x_{k-1}$
+
+### 预测
+- 先验状态$\delta x_{pre} = F\delta x$
+- 先验协方差$P_{pre} = FPF^T+R$
+### 更新
+- 卡尔曼增益$K = P_{pre}H^T(HP_{pre}H^T+Q)^{-1}$
+- 后验状态$\delta x = K(z-Hx)$
+- 后验状态$x = x_{pre} + \delta x$
+- 后验协方差$P = (I-KH)P_{PRE}$
+### 对比KF优点
+- 使用三维变量表达旋转，没有冗余和万向锁问题。
+- 总在原点附近，离奇异点远，数值更稳定，线性化近似效果更好。
+- 状态量为小量，二阶变量可忽略。
+- 状态转移方程，运动学方程比原状态变量更小。
 
 # 异常值剔除策略
 ## RANSAC算法
