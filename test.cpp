@@ -1,33 +1,26 @@
 #include <iostream>
+#include <sstream>
+#include <string>
 
 using namespace std;
 int main(int argc, char **argv)
 {
     cout << "Hello world!" << endl;
-    return 0;
-}
 
-std::vector<int> memo;
+    string line = "1704681348.994629 lidar";
+    std::stringstream iss(line);
 
-int sumGoodsPrice(std::vector<int> goods)
-{
-    memo.resize(goods.size(), -1);
-    return dp(goods, 0);
-}
-//
-int dp(std::vector<int> &nums, int start)
-{
-    if (start >= static_cast<int>(nums.size()))
+    double d;
+    string s;
+    if (iss >> d >> s)
     {
-        return 0;
+
+        cout << "d:" << d << "  s:" << s << endl;
+    }
+    else
+    {
+        cout << line << endl;
     }
 
-    if (memo[start] != -1)
-        return memo[start];
-        
-    int res = std::max(dp(nums, start + 1),
-                       nums[start] + dp(nums, start + 2));
-    // record to memo
-    memo[start] = res;
-    return res;
+    return 0;
 }
